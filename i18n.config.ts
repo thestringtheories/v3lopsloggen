@@ -1,5 +1,5 @@
 // i18n.config.ts
-import type { Pathnames } from 'next-intl/navigation'; // This import is standard for next-intl v3+
+import type { Pathnames } from 'next-intl/navigation'; // Updated import path
 
 export const locales = ['en', 'nb'] as const;
 export const defaultLocale = 'nb' as const;

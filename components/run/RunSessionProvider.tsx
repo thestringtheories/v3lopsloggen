@@ -95,7 +95,11 @@ const runSessionReducer = (state: RunSessionState, action: RunAction): RunSessio
   }
 };
 
-export const RunSessionProvider = ({ children }: { children: ReactNode }) => {
+interface RunSessionProviderProps {
+  children: ReactNode;
+}
+
+export const RunSessionProvider = ({ children }: RunSessionProviderProps) => {
   const [state, dispatch] = useReducer(runSessionReducer, initialState);
   return (
     <RunSessionContext.Provider value={{ state, dispatch }}>

@@ -3,7 +3,8 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRunSession } from './RunSessionProvider';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl'; // Updated import path
 import { useRouter } from '@/app/i18n/navigation';
 import dynamic from 'next/dynamic';
 import LiveStatsBar from './LiveStatsBar';
@@ -13,8 +14,9 @@ import type { GeoPoint } from '@/utils/helpers';
 import { calculateDistance } from '@/utils/helpers';
 import { useAuth } from '@/hooks/useAuth'; // Added useAuth
 import { useToast } from '@/components/ui/ToastProvider'; // Added useToast
+import MapInstanceGrabber from './MapInstanceGrabber'; // Import the new component
 
-import L, { type DivIcon, type Map as LeafletMap } from 'leaflet'; // Changed to direct import
+import L, { DivIcon, Map as LeafletMap } from 'leaflet'; // Updated import for Map
 import type { MapContainerProps, TileLayerProps, MarkerProps, PolylineProps, ZoomControlProps } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -43,7 +45,6 @@ const StopIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
 
 const createPulseIcon = (): DivIcon | null => {
   if (typeof window === 'undefined') return null;
-  // L is now imported directly
   return L.divIcon({
     className: 'custom-pulse-icon',
     html: `<div class="w-5 h-5 bg-primary rounded-full border-2 border-white shadow-xl animate-pulse ring-4 ring-primary/30"></div>`,
@@ -58,14 +59,14 @@ const RunHomeClient: React.FC = () => {
   const t = useTranslations();
   const router = useRouter();
   const locale = useLocale(); // eslint-disable-line @typescript-eslint/no-unused-vars
-  const { user } = useAuth(); // Get authenticated user
-  const { addToast } = useToast(); // Toast notifications
+  const { user } = useAuth(); 
+  const { addToast } = useToast(); 
 
   const [showPermissionOverlay, setShowPermissionOverlay] = useState(false);
   const [pulseIcon, setPulseIcon] = useState<DivIcon | null>(null);
 
   const watchIdRef = useRef<number | null>(null);
-  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timerIntervalRef = useRef<number | null>(null); 
   const mapRef = useRef<LeafletMap | null>(null);
   const gpsToastIdRef = useRef<string | null>(null);
 
@@ -74,6 +75,13 @@ const RunHomeClient: React.FC = () => {
     setPulseIcon(createPulseIcon());
   }, []);
   
+  const handleMapInstance = useCallback((mapInstance: LeafletMap) => {
+    mapRef.current = mapInstance;
+    if (state.currentPosition && mapRef.current) {
+      mapRef.current.setView([state.currentPosition.lat, state.currentPosition.lng], 16);
+    }
+  }, [state.currentPosition]);
+
   const requestLocationPermission = useCallback(() => {
     if (!navigator.geolocation) {
       dispatch({ type: 'LOCATION_ERROR', payload: 'Geolocation is not supported by your browser.' });
@@ -91,7 +99,7 @@ const RunHomeClient: React.FC = () => {
         };
         dispatch({ type: 'LOCATION_SUCCESS', payload: geoPoint });
         setShowPermissionOverlay(false);
-        if (mapRef.current) {
+        if (mapRef.current) { // mapRef might be set by MapInstanceGrabber already
           mapRef.current.setView([geoPoint.lat, geoPoint.lng], 16);
         }
       },
@@ -114,14 +122,14 @@ const RunHomeClient: React.FC = () => {
   useEffect(() => {
     if (state.status === 'running') {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-      timerIntervalRef.current = setInterval(() => {
+      timerIntervalRef.current = window.setInterval(() => { 
         dispatch({ type: 'INCREMENT_DURATION' });
       }, 1000);
 
       if (watchIdRef.current !== null) navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = navigator.geolocation.watchPosition(
         (position) => {
-          if (state.gpsSignalLost) { // If signal was lost, it's now reacquired
+          if (state.gpsSignalLost) { 
             dispatch({ type: 'GPS_SIGNAL_REACQUIRED' });
             if (gpsToastIdRef.current) addToast(t('HomePage.infoGpsSignalRestored'), 'success', { id: gpsToastIdRef.current });
             else addToast(t('HomePage.infoGpsSignalRestored'), 'success');
@@ -139,9 +147,9 @@ const RunHomeClient: React.FC = () => {
         },
         (error) => {
           console.error("Error watching position:", error);
-          if (!state.gpsSignalLost) { // Dispatch and show toast only once per loss
+          if (!state.gpsSignalLost) { 
              dispatch({ type: 'GPS_SIGNAL_LOST' });
-             gpsToastIdRef.current = addToast(t('HomePage.errorGpsSignalLost'), 'warning', { duration: 10000 }); // Show for 10s or until restored
+             gpsToastIdRef.current = addToast(t('HomePage.errorGpsSignalLost'), 'warning', { duration: 10000 }); 
           }
         },
         { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
@@ -153,8 +161,7 @@ const RunHomeClient: React.FC = () => {
         watchIdRef.current = null;
       }
        if (state.gpsSignalLost && (state.status === 'paused' || state.status === 'idle')) {
-        // If run is paused or stopped while signal is lost, clear the persistent toast.
-        if (gpsToastIdRef.current) addToast('', 'blank', {id: gpsToastIdRef.current}); // Effectively removes it
+        if (gpsToastIdRef.current) addToast('', 'blank', {id: gpsToastIdRef.current}); 
         gpsToastIdRef.current = null;
       }
     }
@@ -180,7 +187,7 @@ const RunHomeClient: React.FC = () => {
       return;
     }
     if (!user) {
-      addToast(t('Auth.errorGeneric'), 'error'); // Should not happen if MainLayout protects
+      addToast(t('Auth.errorGeneric'), 'error'); 
       return;
     }
     dispatch({ type: 'PREPARE_SAVE' });
@@ -192,7 +199,7 @@ const RunHomeClient: React.FC = () => {
       }, 0);
 
     const runData = {
-      userId: user.uid, // Add userId
+      userId: user.uid, 
       startTime: state.startTime,
       duration: state.activeDuration,
       route: state.route,
@@ -254,8 +261,9 @@ const RunHomeClient: React.FC = () => {
             zoom={15} 
             className="w-full h-full z-0"
             zoomControl={false}
-            whenReady={(mapInstance: LeafletMap) => { mapRef.current = mapInstance; }}
+            // whenCreated prop removed
         >
+          <MapInstanceGrabber onMapInstance={handleMapInstance} />
           <TileLayer
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'

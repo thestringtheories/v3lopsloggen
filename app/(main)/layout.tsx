@@ -1,4 +1,3 @@
-
 // app/(main)/layout.tsx
 "use client"; 
 
@@ -6,7 +5,7 @@ import React, { useEffect } from 'react';
 import BottomNav from '@/components/layout/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter, usePathname } from '@/app/i18n/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale } from 'next-intl'; // Updated import path
 import { ToastProvider } from '@/components/ui/ToastProvider'; // Import ToastProvider
 
 interface MainLayoutProps {

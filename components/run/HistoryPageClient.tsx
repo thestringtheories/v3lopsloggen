@@ -2,7 +2,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl'; // Updated import path
 import { Link } from '@/app/i18n/navigation';
 import { db } from '@/utils/firebase';
 import { collection, query, where, orderBy, getDocs, Timestamp, type QueryDocumentSnapshot, type DocumentData } from 'firebase/firestore';

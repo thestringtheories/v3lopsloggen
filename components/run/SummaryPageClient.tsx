@@ -1,14 +1,16 @@
 // components/run/SummaryPageClient.tsx
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl'; // Updated import path
 import dynamic from 'next/dynamic';
 import { db } from '@/utils/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { GeoPoint, formatDuration, formatDate } from '@/utils/helpers';
+import MapInstanceGrabber from './MapInstanceGrabber'; // Import the new component
 
-import L, { type Map as LeafletMap } from 'leaflet'; // Changed to direct import
+import L, { Map as LeafletMap } from 'leaflet'; // Updated import for Map
 import type { MapContainerProps, TileLayerProps, PolylineProps, ZoomControlProps } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css'; // Import leaflet CSS
 
@@ -19,14 +21,14 @@ const Polyline = dynamic<PolylineProps>(() => import('react-leaflet').then(mod =
 const ZoomControl = dynamic<ZoomControlProps>(() => import('react-leaflet').then(mod => mod.ZoomControl), { ssr: false });
 
 
-export interface RunData { // Exporting for use in HistoryPageClient
+export interface RunData { 
   id: string;
-  userId?: string; // Optional for older data, but new runs should have it
+  userId?: string; 
   startTime: number;
-  duration: number; // seconds
+  duration: number; 
   route: GeoPoint[];
-  distance: number; // km
-  createdAt: string; // ISO string
+  distance: number; 
+  createdAt: string; 
 }
 
 interface SummaryPageClientProps {
@@ -41,9 +43,13 @@ const SummaryPageClient: React.FC<SummaryPageClientProps> = ({ runId }) => {
   const [error, setError] = useState<string | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
 
+  const handleMapInstance = useCallback((mapInstance: LeafletMap) => {
+    mapRef.current = mapInstance;
+  }, []);
+
   useEffect(() => {
     if (!runId) {
-      setError(t('runNotFound')); // Specifically, the ID is missing
+      setError(t('runNotFound')); 
       setLoading(false);
       return;
     }
@@ -58,15 +64,14 @@ const SummaryPageClient: React.FC<SummaryPageClientProps> = ({ runId }) => {
         if (runDocSnap.exists()) {
           setRunData({ id: runDocSnap.id, ...runDocSnap.data() } as RunData);
         } else {
-          setError(t('runNotFound')); // ID provided, but no document found
+          setError(t('runNotFound')); 
         }
-      } catch (err: any) { // Catch any error
+      } catch (err: any) { 
         console.error("Error fetching run data:", err);
-        // Check for specific Firestore error types if needed, e.g. permission denied
         if (err.code === 'permission-denied') {
-             setError("You don't have permission to view this run."); // Example specific error
+             setError("You don't have permission to view this run."); 
         } else {
-            setError(t('errorLoadingDetails')); // Generic error for other issues
+            setError(t('errorLoadingDetails')); 
         }
       } finally {
         setLoading(false);
@@ -79,7 +84,6 @@ const SummaryPageClient: React.FC<SummaryPageClientProps> = ({ runId }) => {
   useEffect(() => {
     if (mapRef.current && runData && runData.route.length > 0) {
       if (typeof window !== 'undefined') {
-        // L is now imported directly
         const bounds = L.latLngBounds(runData.route.map((p: GeoPoint) => [p.lat, p.lng]));
         if (bounds.isValid()) {
           mapRef.current.fitBounds(bounds, { padding: [50, 50] });
@@ -88,7 +92,7 @@ const SummaryPageClient: React.FC<SummaryPageClientProps> = ({ runId }) => {
         }
       }
     }
-  }, [runData]);
+  }, [runData, mapRef.current]); // Add mapRef.current to dependency array if map instance could change
 
 
   if (loading) {
@@ -128,8 +132,9 @@ const SummaryPageClient: React.FC<SummaryPageClientProps> = ({ runId }) => {
                 zoom={13} 
                 className="w-full h-full"
                 zoomControl={false}
-                whenReady={(mapInstance: LeafletMap) => { mapRef.current = mapInstance; }}
+                // whenCreated prop removed
             >
+              <MapInstanceGrabber onMapInstance={handleMapInstance} />
               <TileLayer
                 url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'

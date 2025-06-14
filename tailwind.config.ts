@@ -1,4 +1,8 @@
+
 import type { Config } from 'tailwindcss';
+
+// Declare require for TypeScript to recognize it in this context
+declare var require: any;
 
 const config: Config = {
   content: [
