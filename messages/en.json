@@ -1,0 +1,98 @@
+
+{
+  "RootLayout": {
+    "title": "Løpsloggen - Løpe App"
+  },
+  "HomePage": {
+    "welcome": "Velkommen til Løpsloggen!",
+    "description": "Din løpereise starter her.",
+    "grantPermission": "Gi posisjonstilgang",
+    "permissionNeeded": "Posisjonstilgang er nødvendig for å spore løpeturen din.",
+    "fetchingLocation": "Henter posisjon...",
+    "errorNoDataToSave": "Ikke nok data til å lagre økten. En økt krever minst to posisjonspunkter.",
+    "errorGpsSignalLost": "GPS-signal midlertidig tapt. Prøver å koble til på nytt...",
+    "infoGpsSignalRestored": "GPS-signal gjenopprettet."
+  },
+  "RunControls": {
+    "start": "Start økt",
+    "pause": "Pause økt",
+    "resume": "Gjenoppta økt",
+    "endAndSave": "Avslutt og lagre økt",
+    "saving": "Lagrer..."
+  },
+  "LiveStatsBar": {
+    "time": "Tid",
+    "distance": "Distanse",
+    "pace": "Tempo",
+    "km": "km",
+    "minKm": "min/km",
+    "gpsStatus": "GPS",
+    "gpsPoor": "Svakt Signal"
+  },
+  "SummaryPage": {
+    "title": "Oppsummering av økt",
+    "yourRun": "Din løpetur",
+    "distance": "Distanse",
+    "duration": "Varighet",
+    "avgPace": "Gj.snittstempo",
+    "date": "Dato",
+    "map": "Rutekart",
+    "aiFeedbackPlaceholder": "AI-drevet tilbakemelding på løpeturen din kommer snart!",
+    "runNotFound": "Løpsdata ikke funnet eller en feil oppstod.",
+    "loadingRun": "Laster løpsdata...",
+    "errorLoadingDetails": "Kunne ikke laste øktdetaljer. Vennligst prøv igjen."
+  },
+  "HistoryPage": {
+    "title": "Løpshistorikk",
+    "loadingRuns": "Laster dine løpeturer...",
+    "noRuns": "Du har ingen loggede løpeturer enda. På tide å komme seg ut!",
+    "errorLoadingRuns": "Kunne ikke laste din løpshistorikk. Vennligst prøv igjen senere.",
+    "runOn": "Løpt den",
+    "viewSummary": "Se oppsummering"
+  },
+  "BottomNav": {
+    "home": "Hjem",
+    "history": "Historikk",
+    "ariaHome": "Gå til Hjemmesiden",
+    "ariaHistory": "Se løpshistorikk",
+    "ariaLogout": "Logg ut"
+  },
+  "Firebase": {
+    "saveSuccess": "Økt lagret!",
+    "saveError": "Kunne ikke lagre økten. Prøv igjen."
+  },
+  "Auth": {
+    "loginTitle": "Løpsloggen",
+    "emailLabel": "E-post",
+    "passwordLabel": "Passord",
+    "signInButton": "Logg inn",
+    "signingInButton": "Logger inn...",
+    "signUpButton": "Registrer deg",
+    "signingUpButton": "Registrerer...",
+    "sendResetLinkButton": "Send tilbakestillingslenke",
+    "sendingResetLinkButton": "Sender lenke...",
+    "logoutButton": "Logg ut",
+    "loginSuccess": "Innlogging vellykket! Omdirigerer...",
+    "signUpSuccess": "Konto opprettet! Du kan nå logge inn.",
+    "resetPasswordEmailSent": "E-post for tilbakestilling av passord er sendt! Sjekk innboksen din.",
+    "forgotPasswordLink": "Glemt passord?",
+    "alreadyHaveAccountLink": "Har du allerede konto? Logg inn",
+    "dontHaveAccountLink": "Har du ikke konto? Registrer deg",
+    "backToLoginLink": "Tilbake til Logg inn",
+    "forgotPasswordTitle": "Tilbakestill passord",
+    "forgotPasswordInstructions": "Skriv inn e-postadressen din, så sender vi deg en lenke for å tilbakestille passordet ditt.",
+    "signUpTitle": "Opprett konto",
+    "showPassword": "Vis passord",
+    "hidePassword": "Skjul passord",
+    "errorInvalidEmail": "Ugyldig e-postformat.",
+    "errorUserNotFound": "Ingen bruker funnet med denne e-posten.",
+    "errorWrongPassword": "Feil passord. Vennligst prøv igjen.",
+    "errorTooManyRequests": "Tilgang til denne kontoen er midlertidig deaktivert på grunn av mange mislykkede påloggingsforsøk. Du kan gjenopprette den umiddelbart ved å tilbakestille passordet ditt, eller du kan prøve igjen senere.",
+    "errorEmailInUse": "Denne e-postadressen er allerede i bruk av en annen konto.",
+    "errorWeakPassword": "Passordet må være minst 6 tegn.",
+    "errorGeneric": "En uventet feil oppstod. Vennligst prøv igjen."
+  },
+  "Toast": {
+    "close": "Lukk varsel"
+  }
+}

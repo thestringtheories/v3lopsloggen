@@ -1,0 +1,80 @@
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --nav-h: 64px; /* Standard height for bottom navigation */
+  --header-h: 56px; /* If you add a top header */
+
+  /* Font smoothing for better text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  @apply h-full;
+}
+
+body {
+  @apply bg-neutral-100 text-neutral-800 flex flex-col font-sans; /* Using Tailwind's default sans-serif (Inter) */
+}
+
+/* Fix for Leaflet's default icon paths when using bundlers like Webpack */
+.leaflet-control-attribution a, .leaflet-control-layers-toggle {
+  background-image: none !important; /* Remove if causing issues, but often needed */
+}
+.leaflet-marker-icon, .leaflet-marker-shadow {
+  background-image: url('~leaflet/dist/images/marker-icon.png');
+}
+.leaflet-marker-icon.leaflet-interactive[src$="marker-icon-2x.png"] {
+    background-image: url('~leaflet/dist/images/marker-icon-2x.png');
+}
+.leaflet-marker-shadow {
+    background-image: url('~leaflet/dist/images/marker-shadow.png');
+}
+
+
+/* Custom Scrollbars for a more modern look (optional) */
+/* For Webkit-based browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+::-webkit-scrollbar-track {
+  @apply bg-neutral-200 rounded-full;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-400 rounded-full hover:bg-neutral-500;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.neutral.400') theme('colors.neutral.200');
+}
+
+/* Input placeholder text color */
+::placeholder {
+  @apply text-neutral-400;
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-semibold transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-dark focus:ring-opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-dark disabled:bg-neutral-300 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply btn bg-secondary text-white hover:bg-secondary-dark disabled:bg-neutral-300 disabled:cursor-not-allowed;
+  }
+  .btn-ghost {
+    @apply btn text-primary hover:bg-primary/10;
+  }
+  .input-field {
+    @apply block w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900
+           placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+           disabled:bg-neutral-100 disabled:text-neutral-500;
+  }
+}
