@@ -1,9 +1,11 @@
+
 // components/run/HistoryPageClient.tsx
 "use client";
 
 import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl'; // Updated import path
+import { useParams } from 'next/navigation'; // Changed from useLocale
+import type { AppLocale } from '@/next-intl.config'; // Added for type safety
 import { Link } from '@/app/i18n/navigation';
 import { db } from '@/utils/firebase';
 import { collection, query, where, orderBy, getDocs, Timestamp, type QueryDocumentSnapshot, type DocumentData } from 'firebase/firestore';
@@ -36,7 +38,8 @@ const ChevronRightIcon = ({ className = "w-5 h-5" }: { className?: string }) => 
 
 const HistoryPageClient: React.FC = () => {
   const t = useTranslations('HistoryPage');
-  const locale = useLocale();
+  const params = useParams(); // Changed
+  const locale = params.locale as AppLocale; // Changed
   const { user } = useAuth();
   const [runs, setRuns] = useState<RunData[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,20 +1,21 @@
+
 import {notFound} from 'next/navigation';
 import {getRequestConfig} from 'next-intl/server'; 
-import type {AbstractIntlMessages} from 'next-intl'; // Updated import path
-import { locales } from '@/i18n.config'; // Import locales from config
+// import type { AbstractIntlMessages } from 'next-intl'; // Removed due to import error
+import { locales } from '@/next-intl.config'; // Import locales from renamed config
 
 // Removed redundant local definitions of locales and defaultLocale
 
 // Define a type for your messages if you have a specific structure
-type LocaleMessages = AbstractIntlMessages;
+// type LocaleMessages = AbstractIntlMessages; // Removed
 
 export default getRequestConfig(async ({locale}) => {
   // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale as any)) { // Uses locales from i18n.config.ts
+  if (!locales.includes(locale as any)) { // Uses locales from next-intl.config.ts
     notFound();
   }
 
-  let messages: LocaleMessages;
+  let messages; // Type will be inferred
   try {
     messages = (await import(`./messages/${locale}.json`)).default;
   } catch (error) {
@@ -23,7 +24,7 @@ export default getRequestConfig(async ({locale}) => {
   }
 
   return {
-    locale,
+    locale: locale!,
     messages
   };
 });

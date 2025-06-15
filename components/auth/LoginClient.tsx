@@ -13,7 +13,7 @@ import {
   sendPasswordResetEmail // Imported from utils/firebase
 } from '@/utils/firebase'; 
 import { auth } from '@/utils/firebase'; 
-import { pathnames } from '@/i18n.config';
+import { pathnames } from '@/next-intl.config';
 
 // Simple SVG Icons
 const EmailIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -60,7 +60,8 @@ const LoginClient: React.FC = () => {
   useEffect(() => {
     if (!authLoading && user && authMode !== 'signup') { // Don't redirect immediately after signup
       const redirectParam = searchParams.get('redirect');
-      const typedRedirectPath = (redirectParam || '/') as keyof typeof pathnames;
+      const typedRedirectPath =
+      (redirectParam || '/') as keyof typeof pathnames & string;
       router.replace(typedRedirectPath);
     }
   }, [user, authLoading, router, searchParams, authMode]);

@@ -1,3 +1,4 @@
+
 // app/(main)/layout.tsx
 "use client"; 
 
@@ -5,7 +6,7 @@ import React, { useEffect } from 'react';
 import BottomNav from '@/components/layout/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter, usePathname } from '@/app/i18n/navigation';
-import { useLocale } from 'next-intl'; // Updated import path
+import type { AppLocale } from '@/next-intl.config'; // Added for type safety
 import { ToastProvider } from '@/components/ui/ToastProvider'; // Import ToastProvider
 
 interface MainLayoutProps {
@@ -17,7 +18,7 @@ export default function MainLayout({ children, params }: MainLayoutProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname(); 
-  const locale = useLocale(); 
+  const locale = params.locale as AppLocale; // Changed: use locale from params
 
   useEffect(() => {
     if (!loading && !user) {
@@ -25,7 +26,7 @@ export default function MainLayout({ children, params }: MainLayoutProps) {
       const currentPath = pathname; // pathname already includes the locale
       router.replace(`/login?redirect=${encodeURIComponent(currentPath)}`);
     }
-  }, [user, loading, router, pathname, locale]);
+  }, [user, loading, router, pathname, locale]); // locale is used in dependency array
 
 
   if (loading || (!loading && !user)) {

@@ -1,10 +1,12 @@
+
 // components/run/RunHomeClient.tsx
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRunSession } from './RunSessionProvider';
 import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl'; // Updated import path
+import { useParams } from 'next/navigation'; // Changed from useLocale
+import type { AppLocale } from '@/next-intl.config'; // Added for type safety
 import { useRouter } from '@/app/i18n/navigation';
 import dynamic from 'next/dynamic';
 import LiveStatsBar from './LiveStatsBar';
@@ -58,7 +60,8 @@ const RunHomeClient: React.FC = () => {
   const { state, dispatch } = useRunSession();
   const t = useTranslations();
   const router = useRouter();
-  const locale = useLocale(); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const params = useParams(); // Changed
+  const locale = params.locale as AppLocale; // eslint-disable-line @typescript-eslint/no-unused-vars // Changed
   const { user } = useAuth(); 
   const { addToast } = useToast(); 
 

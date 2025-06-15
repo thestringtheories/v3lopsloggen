@@ -1,9 +1,11 @@
+
 // components/run/SummaryPageClient.tsx
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl'; // Updated import path
+import { useParams } from 'next/navigation'; // Changed from useLocale
+import type { AppLocale } from '@/next-intl.config'; // Added for type safety
 import dynamic from 'next/dynamic';
 import { db } from '@/utils/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -37,7 +39,8 @@ interface SummaryPageClientProps {
 
 const SummaryPageClient: React.FC<SummaryPageClientProps> = ({ runId }) => {
   const t = useTranslations('SummaryPage');
-  const locale = useLocale();
+  const params = useParams(); // Changed
+  const locale = params.locale as AppLocale; // Changed
   const [runData, setRunData] = useState<RunData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
