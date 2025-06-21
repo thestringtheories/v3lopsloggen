@@ -5,8 +5,11 @@
 @tailwind utilities;
 
 :root {
-  --nav-h: 64px; /* Standard height for bottom navigation */
-  --header-h: 56px; /* If you add a top header */
+  /* Layout constants that multiple components rely on */
+  --nav-h: 64px;   /* BottomNav */
+  --header-h: 56px; /* LiveStatsBar / Top header */
+  /* Extra offset that guarantees content clears BottomNav *and* iOS Home‑indicator */
+  --safe-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
 
   /* Font smoothing for better text rendering */
   -webkit-font-smoothing: antialiased;

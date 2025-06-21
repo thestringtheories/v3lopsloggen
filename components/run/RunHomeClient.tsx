@@ -1,24 +1,24 @@
-
 // components/run/RunHomeClient.tsx
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRunSession } from './RunSessionProvider';
 import { useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation'; // Changed from useLocale
-import type { AppLocale } from '@/next-intl.config'; // Added for type safety
+import { useParams } from 'next/navigation';
+import type { AppLocale } from '@/next-intl.config';
 import { useRouter } from '@/app/i18n/navigation';
 import dynamic from 'next/dynamic';
 import LiveStatsBar from './LiveStatsBar';
-import { db, auth } from '@/utils/firebase'; // Added auth
+import { db } from '@/utils/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import type { GeoPoint } from '@/utils/helpers';
 import { calculateDistance } from '@/utils/helpers';
-import { useAuth } from '@/hooks/useAuth'; // Added useAuth
-import { useToast } from '@/components/ui/ToastProvider'; // Added useToast
-import MapInstanceGrabber from './MapInstanceGrabber'; // Import the new component
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/components/ui/ToastProvider';
+import MapInstanceGrabber from './MapInstanceGrabber';
+import FABWrapper from './FABwrapper';
 
-import L, { DivIcon, Map as LeafletMap } from 'leaflet'; // Updated import for Map
+import L, { DivIcon, Map as LeafletMap } from 'leaflet';
 import type { MapContainerProps, TileLayerProps, MarkerProps, PolylineProps, ZoomControlProps } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -55,29 +55,27 @@ const createPulseIcon = (): DivIcon | null => {
   });
 };
 
-
 const RunHomeClient: React.FC = () => {
   const { state, dispatch } = useRunSession();
   const t = useTranslations();
   const router = useRouter();
-  const params = useParams(); // Changed
-  const locale = params.locale as AppLocale; // eslint-disable-line @typescript-eslint/no-unused-vars // Changed
-  const { user } = useAuth(); 
-  const { addToast } = useToast(); 
+  const params = useParams();
+  const locale = params.locale as AppLocale;
+  const { user } = useAuth();
+  const { addToast } = useToast();
 
   const [showPermissionOverlay, setShowPermissionOverlay] = useState(false);
   const [pulseIcon, setPulseIcon] = useState<DivIcon | null>(null);
 
   const watchIdRef = useRef<number | null>(null);
-  const timerIntervalRef = useRef<number | null>(null); 
+  const timerIntervalRef = useRef<number | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const gpsToastIdRef = useRef<string | null>(null);
-
 
   useEffect(() => {
     setPulseIcon(createPulseIcon());
   }, []);
-  
+
   const handleMapInstance = useCallback((mapInstance: LeafletMap) => {
     mapRef.current = mapInstance;
     if (state.currentPosition && mapRef.current) {
@@ -102,7 +100,7 @@ const RunHomeClient: React.FC = () => {
         };
         dispatch({ type: 'LOCATION_SUCCESS', payload: geoPoint });
         setShowPermissionOverlay(false);
-        if (mapRef.current) { // mapRef might be set by MapInstanceGrabber already
+        if (mapRef.current) {
           mapRef.current.setView([geoPoint.lat, geoPoint.lng], 16);
         }
       },
@@ -125,14 +123,14 @@ const RunHomeClient: React.FC = () => {
   useEffect(() => {
     if (state.status === 'running') {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-      timerIntervalRef.current = window.setInterval(() => { 
+      timerIntervalRef.current = window.setInterval(() => {
         dispatch({ type: 'INCREMENT_DURATION' });
       }, 1000);
 
       if (watchIdRef.current !== null) navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = navigator.geolocation.watchPosition(
         (position) => {
-          if (state.gpsSignalLost) { 
+          if (state.gpsSignalLost) {
             dispatch({ type: 'GPS_SIGNAL_REACQUIRED' });
             if (gpsToastIdRef.current) addToast(t('HomePage.infoGpsSignalRestored'), 'success', { id: gpsToastIdRef.current });
             else addToast(t('HomePage.infoGpsSignalRestored'), 'success');
@@ -145,14 +143,14 @@ const RunHomeClient: React.FC = () => {
           };
           dispatch({ type: 'ADD_ROUTE_POINT', payload: newPoint });
           if (mapRef.current) {
-             mapRef.current.panTo([newPoint.lat, newPoint.lng]);
+            mapRef.current.panTo([newPoint.lat, newPoint.lng]);
           }
         },
         (error) => {
           console.error("Error watching position:", error);
-          if (!state.gpsSignalLost) { 
-             dispatch({ type: 'GPS_SIGNAL_LOST' });
-             gpsToastIdRef.current = addToast(t('HomePage.errorGpsSignalLost'), 'warning', { duration: 10000 }); 
+          if (!state.gpsSignalLost) {
+            dispatch({ type: 'GPS_SIGNAL_LOST' });
+            gpsToastIdRef.current = addToast(t('HomePage.errorGpsSignalLost'), 'warning', { duration: 10000 });
           }
         },
         { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
@@ -163,8 +161,8 @@ const RunHomeClient: React.FC = () => {
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;
       }
-       if (state.gpsSignalLost && (state.status === 'paused' || state.status === 'idle')) {
-        if (gpsToastIdRef.current) addToast('', 'blank', {id: gpsToastIdRef.current}); 
+      if (state.gpsSignalLost && (state.status === 'paused' || state.status === 'idle')) {
+        if (gpsToastIdRef.current) addToast('', 'blank', { id: gpsToastIdRef.current });
         gpsToastIdRef.current = null;
       }
     }
@@ -186,23 +184,23 @@ const RunHomeClient: React.FC = () => {
   const handleSaveRun = async () => {
     if (!state.startTime || state.route.length < 2) {
       addToast(t('HomePage.errorNoDataToSave'), 'error');
-      dispatch({type: 'RESET_RUN'});
+      dispatch({ type: 'RESET_RUN' });
       return;
     }
     if (!user) {
-      addToast(t('Auth.errorGeneric'), 'error'); 
+      addToast(t('Auth.errorGeneric'), 'error');
       return;
     }
     dispatch({ type: 'PREPARE_SAVE' });
 
     const totalDistance = state.route.reduce((acc: number, point: GeoPoint, index: number, arr: GeoPoint[]) => {
-        if (index === 0) return 0;
-        const prevPoint = arr[index - 1];
-        return acc + calculateDistance(prevPoint.lat, prevPoint.lng, point.lat, point.lng);
-      }, 0);
+      if (index === 0) return 0;
+      const prevPoint = arr[index - 1];
+      return acc + calculateDistance(prevPoint.lat, prevPoint.lng, point.lat, point.lng);
+    }, 0);
 
     const runData = {
-      userId: user.uid, 
+      userId: user.uid,
       startTime: state.startTime,
       duration: state.activeDuration,
       route: state.route,
@@ -214,7 +212,7 @@ const RunHomeClient: React.FC = () => {
       const docRef = await addDoc(collection(db, "runs"), runData);
       addToast(t('Firebase.saveSuccess'), 'success');
       dispatch({ type: 'SAVE_RUN_SUCCESS' });
-      router.push(`/løp/summary?runId=${docRef.id}`); 
+      router.push(`/løp/summary?runId=${docRef.id}`);
       dispatch({ type: 'RESET_RUN' });
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -222,12 +220,12 @@ const RunHomeClient: React.FC = () => {
       dispatch({ type: 'RESET_RUN' });
     }
   };
-  
+
   const polylinePositions = state.route.map((p: GeoPoint) => [p.lat, p.lng] as [number, number]);
 
   return (
     <div className="flex flex-col h-full bg-neutral-200">
-      { (state.status === 'running' || state.status === 'paused') && 
+      {(state.status === 'running' || state.status === 'paused') &&
         <LiveStatsBar activeDuration={state.activeDuration} route={state.route} gpsSignalLost={state.gpsSignalLost} />
       }
       <div className="flex-grow relative">
@@ -253,18 +251,17 @@ const RunHomeClient: React.FC = () => {
             </div>
           </div>
         )}
-         {state.error && !showPermissionOverlay && state.status !== 'locating' && (
-             <div className="absolute top-4 left-1/2 -translate-x-1/2 p-3 bg-error text-white text-center text-sm z-30 shadow-md rounded-md max-w-sm w-11/12">
-                {t('HomePage.permissionNeeded')} {state.error}
-             </div>
-         )}
+        {state.error && !showPermissionOverlay && state.status !== 'locating' && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 p-3 bg-error text-white text-center text-sm z-30 shadow-md rounded-md max-w-sm w-11/12">
+            {t('HomePage.permissionNeeded')} {state.error}
+          </div>
+        )}
 
-        <MapContainer 
-            center={state.currentPosition ? [state.currentPosition.lat, state.currentPosition.lng] : [59.9139, 10.7522]}
-            zoom={15} 
-            className="w-full h-full z-0"
-            zoomControl={false}
-            // whenCreated prop removed
+        <MapContainer
+          center={state.currentPosition ? [state.currentPosition.lat, state.currentPosition.lng] : [59.9139, 10.7522]}
+          zoom={15}
+          className="w-full h-[calc(100dvh-var(--header-h)-var(--safe-bottom))] z-0"
+          zoomControl={false}
         >
           <MapInstanceGrabber onMapInstance={handleMapInstance} />
           <TileLayer
@@ -279,11 +276,12 @@ const RunHomeClient: React.FC = () => {
             <Polyline pathOptions={{ color: '#14b8a6', weight: 5, opacity: 0.8 }} positions={polylinePositions} />
           )}
         </MapContainer>
-        
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-3 w-full px-4">
+
+        {/* FAB-wrapper – alltid over BottomNav og Home-indikator */}
+        <FABWrapper>
           {state.status === 'idle' && !state.error && state.currentPosition && (
-            <button 
-              onClick={handleStartRun} 
+            <button
+              onClick={handleStartRun}
               className="flex items-center justify-center w-20 h-20 bg-primary hover:bg-primary-dark text-white rounded-full shadow-xl transition-transform duration-150 ease-in-out active:scale-95"
               aria-label={t('RunControls.start')}
             >
@@ -291,8 +289,8 @@ const RunHomeClient: React.FC = () => {
             </button>
           )}
           {state.status === 'running' && (
-            <button 
-              onClick={() => dispatch({ type: 'PAUSE_RUN' })} 
+            <button
+              onClick={() => dispatch({ type: 'PAUSE_RUN' })}
               className="flex items-center justify-center w-16 h-16 bg-amber-500 hover:bg-amber-600 text-white rounded-full shadow-lg transition-transform duration-150 ease-in-out active:scale-95"
               aria-label={t('RunControls.pause')}
             >
@@ -301,15 +299,15 @@ const RunHomeClient: React.FC = () => {
           )}
           {state.status === 'paused' && (
             <div className="flex gap-4">
-              <button 
-                onClick={() => dispatch({ type: 'RESUME_RUN' })} 
+              <button
+                onClick={() => dispatch({ type: 'RESUME_RUN' })}
                 className="flex items-center justify-center w-16 h-16 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg transition-transform duration-150 ease-in-out active:scale-95"
                 aria-label={t('RunControls.resume')}
               >
                 <PlayIcon className="w-8 h-8" />
               </button>
-              <button 
-                onClick={handleSaveRun} 
+              <button
+                onClick={handleSaveRun}
                 className="flex items-center justify-center w-16 h-16 bg-neutral-700 hover:bg-neutral-600 text-white rounded-full shadow-lg transition-transform duration-150 ease-in-out active:scale-95"
                 aria-label={t('RunControls.endAndSave')}
               >
@@ -317,9 +315,9 @@ const RunHomeClient: React.FC = () => {
               </button>
             </div>
           )}
-        </div>
+        </FABWrapper>
       </div>
-       <style jsx global>{`
+      <style jsx global>{`
         .custom-pulse-icon div {
           animation: customPulse 1.75s infinite cubic-bezier(0.66, 0, 0, 1);
         }

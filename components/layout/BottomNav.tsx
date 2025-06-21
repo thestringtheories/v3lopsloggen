@@ -1,4 +1,3 @@
-
 // components/layout/BottomNav.tsx
 "use client";
 
@@ -7,7 +6,8 @@ import { Link, usePathname } from '@/app/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useAuth';
 
-// SVG Icons for Navigation
+// ... Ikonene (samme som før) ...
+
 const HomeIconSolid = ({ className = "w-6 h-6" } : {className?: string}) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.061l8.69-8.69Z" />
@@ -31,13 +31,11 @@ const HistoryIconOutline = ({ className = "w-6 h-6" } : {className?: string}) =>
   </svg>
 );
 
-
 const LogoutIcon = ({ className = "w-6 h-6" } : {className?: string}) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
   </svg>
 );
-
 
 const BottomNav: React.FC = () => {
   const t = useTranslations(); 
@@ -55,41 +53,46 @@ const BottomNav: React.FC = () => {
   };
 
   return (
-    <nav className="h-full">
-      <ul className="flex justify-around items-center h-full">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = isActive ? item.IconSolid : item.IconOutline;
-          return (
-            <li key={item.href} className="flex-1">
-              <Link 
-                href={item.href} 
-                className={`flex flex-col items-center justify-center h-full p-2 transition-colors duration-150 ease-in-out group
-                            ${isActive ? 'text-primary' : 'text-neutral-500 hover:text-primary-light'}`}
-                aria-label={t(item.ariaLabelKey)}
-              >
-                <Icon className={`w-6 h-6 mb-0.5 transform group-hover:scale-110 transition-transform`} />
-                <span className={`text-xs font-medium ${isActive ? 'text-primary' : 'text-neutral-600 group-hover:text-primary-light'}`}>
-                  {t(item.labelKey)}
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-        <li className="flex-1">
-          <button
-            onClick={handleLogout}
-            className="flex flex-col items-center justify-center h-full p-2 w-full text-neutral-500 hover:text-error group transition-colors duration-150 ease-in-out"
-            aria-label={t('BottomNav.ariaLogout')}
-          >
-            <LogoutIcon className="w-6 h-6 mb-0.5 transform group-hover:scale-110 transition-transform" />
-            <span className="text-xs font-medium text-neutral-600 group-hover:text-error">
-              {t('Auth.logoutButton')}
-            </span>
-          </button>
-        </li>
-      </ul>
-    </nav>
+    <footer
+      className="fixed bottom-0 inset-x-0 bg-white shadow-md pb-[env(safe-area-inset-bottom)]"
+      style={{ height: "var(--nav-h)" }}
+    >
+      <nav className="h-full">
+        <ul className="flex justify-around items-center h-full">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = isActive ? item.IconSolid : item.IconOutline;
+            return (
+              <li key={item.href} className="flex-1">
+                <Link 
+                  href={item.href} 
+                  className={`flex flex-col items-center justify-center h-full p-2 transition-colors duration-150 ease-in-out group
+                              ${isActive ? 'text-primary' : 'text-neutral-500 hover:text-primary-light'}`}
+                  aria-label={t(item.ariaLabelKey)}
+                >
+                  <Icon className={`w-6 h-6 mb-0.5 transform group-hover:scale-110 transition-transform`} />
+                  <span className={`text-xs font-medium ${isActive ? 'text-primary' : 'text-neutral-600 group-hover:text-primary-light'}`}>
+                    {t(item.labelKey)}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+          <li className="flex-1">
+            <button
+              onClick={handleLogout}
+              className="flex flex-col items-center justify-center h-full p-2 w-full text-neutral-500 hover:text-error group transition-colors duration-150 ease-in-out"
+              aria-label={t('BottomNav.ariaLogout')}
+            >
+              <LogoutIcon className="w-6 h-6 mb-0.5 transform group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-medium text-neutral-600 group-hover:text-error">
+                {t('Auth.logoutButton')}
+              </span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </footer>
   );
 };
 
