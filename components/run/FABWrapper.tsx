@@ -8,7 +8,7 @@ interface Props {
 }
 
 /**
- * A safe‑area‑aware wrapper that pins its children (normally one or two
+ * A safe‑area‑aware wrapper (three words) that pins its children (normally one or two
  * floating action buttons) nederst på skjermen – rett over BottomNav og
  * iOS‑Home‑indikatoren.  
  * Hele overlayet er `pointer-events-none` slik at kartet under kan dras, men
