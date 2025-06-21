@@ -16,7 +16,7 @@ import { calculateDistance } from '@/utils/helpers';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/ui/ToastProvider';
 import MapInstanceGrabber from './MapInstanceGrabber';
-import FABWrapper from './FABwrapper';
+import FABwrapper from './FABWrapper';
 
 import L, { DivIcon, Map as LeafletMap } from 'leaflet';
 import type { MapContainerProps, TileLayerProps, MarkerProps, PolylineProps, ZoomControlProps } from 'react-leaflet';
@@ -278,7 +278,7 @@ const RunHomeClient: React.FC = () => {
         </MapContainer>
 
         {/* FAB-wrapper – alltid over BottomNav og Home-indikator */}
-        <FABWrapper>
+        <FABwrapper>
           {state.status === 'idle' && !state.error && state.currentPosition && (
             <button
               onClick={handleStartRun}
@@ -315,7 +315,7 @@ const RunHomeClient: React.FC = () => {
               </button>
             </div>
           )}
-        </FABWrapper>
+        </FABwrapper>
       </div>
       <style jsx global>{`
         .custom-pulse-icon div {
