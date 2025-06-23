@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import type { AppLocale } from '@/next-intl.config';
 import { useRouter } from '@/app/i18n/navigation';
 import dynamic from 'next/dynamic';
-import LiveStatsBar from './LiveStatsBar';
+import SessionHeader from './SessionHeader';            /* ← renamet import */
 import { db } from '@/utils/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import type { GeoPoint } from '@/utils/helpers';
@@ -255,7 +255,7 @@ const RunHomeClient: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-neutral-200">
       {(state.status === 'running' || state.status === 'paused') && (
-        <LiveStatsBar
+        <SessionHeader                      /* ← bruker nytt navn */
           activeDuration={state.activeDuration}
           route={state.route}
           gpsSignalLost={state.gpsSignalLost}
