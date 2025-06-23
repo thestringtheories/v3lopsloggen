@@ -1,46 +1,56 @@
+/* app/global.css (komplett, oppdatert) */
 @import 'leaflet/dist/leaflet.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------
+   CSS-variabler brukt på tvers av layout-komponentene
+-------------------------------------------------------------------*/
 :root {
-  /* Layout constants that multiple components rely on */
-  --nav-h: 64px;   /* BottomNav */
-  --header-h: 56px; /* LiveStatsBar / Top header */
-  /* Extra offset that guarantees content clears BottomNav *and* iOS Home‑indicator */
+  --nav-h: 64px;        /* Høyden til BottomNav */
+  --header-h: 56px;     /* Reservehøyde til evt. topp-header */
+  /* Avstand som sikrer klaring for BottomNav + iOS-Home-indikator */
   --safe-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
 
-  /* Font smoothing for better text rendering */
+  /* Font-utjevning */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+html,
+body {
   @apply h-full;
 }
 
 body {
-  @apply bg-neutral-100 text-neutral-800 flex flex-col font-sans; /* Using Tailwind's default sans-serif (Inter) */
+  /* Tailwind neutral-palett holder seg i tråd med appens lyse modus.
+     Dark-mode håndteres av Tailwinds 'dark:'-klasser. */
+  @apply bg-neutral-100 text-neutral-800 flex flex-col font-sans;
 }
 
-/* Fix for Leaflet's default icon paths when using bundlers like Webpack */
-.leaflet-control-attribution a, .leaflet-control-layers-toggle {
-  background-image: none !important; /* Remove if causing issues, but often needed */
+/* ------------------------------------------------------------------
+   Leaflet – fikser sprite-URLer når bundlet
+-------------------------------------------------------------------*/
+.leaflet-control-attribution a,
+.leaflet-control-layers-toggle {
+  background-image: none !important;
 }
-.leaflet-marker-icon, .leaflet-marker-shadow {
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
   background-image: url('~leaflet/dist/images/marker-icon.png');
 }
-.leaflet-marker-icon.leaflet-interactive[src$="marker-icon-2x.png"] {
-    background-image: url('~leaflet/dist/images/marker-icon-2x.png');
+.leaflet-marker-icon.leaflet-interactive[src$='marker-icon-2x.png'] {
+  background-image: url('~leaflet/dist/images/marker-icon-2x.png');
 }
 .leaflet-marker-shadow {
-    background-image: url('~leaflet/dist/images/marker-shadow.png');
+  background-image: url('~leaflet/dist/images/marker-shadow.png');
 }
 
-
-/* Custom Scrollbars for a more modern look (optional) */
-/* For Webkit-based browsers (Chrome, Safari, Edge) */
+/* ------------------------------------------------------------------
+   Scrollbar (WebKit) + Firefox
+-------------------------------------------------------------------*/
 ::-webkit-scrollbar {
   @apply w-2 h-2;
 }
@@ -51,17 +61,19 @@ body {
   @apply bg-neutral-400 rounded-full hover:bg-neutral-500;
 }
 
-/* For Firefox */
 * {
   scrollbar-width: thin;
   scrollbar-color: theme('colors.neutral.400') theme('colors.neutral.200');
 }
 
-/* Input placeholder text color */
+/* Placeholder-farge */
 ::placeholder {
   @apply text-neutral-400;
 }
 
+/* ------------------------------------------------------------------
+   Tailwind component-klasser
+-------------------------------------------------------------------*/
 @layer components {
   .btn {
     @apply px-4 py-2 rounded-lg font-semibold transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-dark focus:ring-opacity-50;
@@ -79,5 +91,14 @@ body {
     @apply block w-full px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-neutral-900
            placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
            disabled:bg-neutral-100 disabled:text-neutral-500;
+  }
+
+  /* ----------------------------------------------------------------
+     NY: safe-fixed-bottom
+     Gir padding-bottom som matcher --safe-bottom, slik at
+     full-bredde knapper ikke kolliderer med BottomNav + Home-indikator.
+  -----------------------------------------------------------------*/
+  .safe-fixed-bottom {
+    padding-bottom: var(--safe-bottom);
   }
 }

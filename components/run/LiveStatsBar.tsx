@@ -37,7 +37,6 @@ const GpsStrongIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
 </svg>
 );
 
-
 interface LiveStatsBarProps {
   activeDuration: number;
   route: GeoPoint[];
@@ -56,7 +55,7 @@ const LiveStatsBar: React.FC<LiveStatsBarProps> = ({ activeDuration, route, gpsS
   const pace = totalDistance > 0 && activeDuration > 0 ? (activeDuration / 60) / totalDistance : 0; // min/km
 
   return (
-    <div className="bg-neutral-800/80 backdrop-blur-md text-neutral-100 p-3 shadow-lg sticky top-0 z-30">
+    <div className="mx-4 -mt-14 rounded-2xl bg-neutral-50/90 dark:bg-neutral-800/85 p-4 shadow-md backdrop-blur-md z-30 text-neutral-900 dark:text-neutral-100">
       <div className="container mx-auto flex justify-around text-center">
         <div className="flex flex-col items-center">
           <div className="flex items-center gap-1 text-xs uppercase text-neutral-400 mb-0.5">
@@ -82,7 +81,7 @@ const LiveStatsBar: React.FC<LiveStatsBarProps> = ({ activeDuration, route, gpsS
           <div className={`flex items-center gap-1 text-xs uppercase mb-0.5 ${gpsSignalLost ? 'text-warning' : 'text-neutral-400'}`}>
             {gpsSignalLost ? <GpsWeakIcon className="text-warning" /> : <GpsStrongIcon />} {t('gpsStatus')}
           </div>
-          <div className={`text-xl font-semibold ${gpsSignalLost ? 'text-warning animate-pulse' : 'text-neutral-100'}`}>
+          <div className={`text-xl font-semibold ${gpsSignalLost ? 'text-warning animate-pulse' : 'text-neutral-900 dark:text-neutral-100'}`}>
             {gpsSignalLost ? t('gpsPoor') : "OK"}
           </div>
         </div>
