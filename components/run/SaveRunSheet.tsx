@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-async-client-component, @next/next/no-assign-function-props */
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import Button from '@/components/ui/Button';           // én, korrekt import
+import Button from '@/components/ui/Button';
 import { useRunSession } from './RunSessionProvider';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
@@ -24,7 +24,7 @@ export default function SaveRunSheet({
   const { state } = useRunSession();
   const t = useTranslations('run');
 
-  /* -------- beregn distanse én gang per ruteendring -------- */
+  /* -------- beregn distanse én gang per rute-endring -------- */
   const distanceMeters = useMemo(() => {
     return state.route.reduce((acc, p, i, arr) => {
       if (i === 0) return acc;
@@ -40,10 +40,17 @@ export default function SaveRunSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="pt-4 pb-6 rounded-t-2xl max-h-[90vh] overflow-y-auto">
+      {/* side="bottom" → glir opp som klassisk bottom-sheet */}
+      <SheetContent
+        side="bottom"
+        className="w-full pt-4 pb-6 rounded-t-2xl max-h-[90vh] overflow-y-auto scroll-smooth"
+      >
         <h2 className="text-lg font-semibold mb-3">{runName}</h2>
 
-        <RunMapPreview points={state.route.map((p) => [p.lat, p.lng])} />
+        {/* kartet får fast høyde så resten av innholdet blir synlig uten mye scrolling */}
+        <div className="h-[40vh] mb-4">
+          <RunMapPreview points={state.route.map((p) => [p.lat, p.lng])} />
+        </div>
 
         <RunStats distance={distanceMeters} duration={state.activeDuration} />
 
