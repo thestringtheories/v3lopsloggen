@@ -246,7 +246,7 @@ const RunHomeClient: React.FC = () => {
         />
       )}
 
-      <main className="flex-grow pb-[calc(var(--nav-h)_+_1rem)]">
+      <main className="relative flex-1 pb-[calc(var(--nav-h)_+_1rem)]">
         {/* kart-wrapper og overlays uendret */}
         {/* … */}
 
