@@ -221,6 +221,7 @@ const RunHomeClient: React.FC = () => {
     }
   };
 
+  // Om "running" eller "paused", vis SessionHeader
   const showSessionHeader = state.status === 'running' || state.status === 'paused';
 
   /* ========================== RENDER =========================== */
@@ -234,8 +235,12 @@ const RunHomeClient: React.FC = () => {
         />
       )}
 
-      <main className="relative flex-1 flex flex-col pb-[calc(var(--nav-h)_+_1rem)]">
-        <div className="flex-1 w-full rounded-lg overflow-hidden border border-neutral-200 flex">
+      <main className="relative flex-1 pb-[calc(var(--nav-h)_+_1rem)]">
+        {/* LEAFLET-KART */}
+        <div
+          className="w-full rounded-lg overflow-hidden border border-neutral-200"
+          style={{ height: 320 }}
+        >
           <MapContainer
             center={state.currentPosition
               ? [state.currentPosition.lat, state.currentPosition.lng]
