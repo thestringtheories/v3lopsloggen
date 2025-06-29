@@ -221,16 +221,7 @@ const RunHomeClient: React.FC = () => {
     }
   };
 
-  // ---- NYTT: Juster kart-høyde dynamisk basert på SessionHeader ----
   const showSessionHeader = state.status === 'running' || state.status === 'paused';
-  const mapHeight = showSessionHeader ? 'h-[170px] md:h-[240px]' : 'h-80 md:h-96';
-
-  // ---- NYTT: Kall invalidateSize() på kart når header vises/skjules ----
-  useEffect(() => {
-    if (mapRef.current) {
-      setTimeout(() => mapRef.current?.invalidateSize(), 300);
-    }
-  }, [showSessionHeader]);
 
   /* ========================== RENDER =========================== */
   return (
@@ -243,9 +234,8 @@ const RunHomeClient: React.FC = () => {
         />
       )}
 
-      <main className="relative flex-1 pb-[calc(var(--nav-h)_+_1rem)]">
-        {/* LEAFLET-KART */}
-        <div className={`${mapHeight} w-full rounded-lg overflow-hidden border border-neutral-200 mb-6 transition-all duration-300`}>
+      <main className="relative flex-1 flex flex-col pb-[calc(var(--nav-h)_+_1rem)]">
+        <div className="flex-1 w-full rounded-lg overflow-hidden border border-neutral-200 flex">
           <MapContainer
             center={state.currentPosition
               ? [state.currentPosition.lat, state.currentPosition.lng]
