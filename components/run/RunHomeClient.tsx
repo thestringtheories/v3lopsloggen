@@ -89,17 +89,14 @@ const RunHomeClient: React.FC = () => {
   const mapRef        = useRef<LeafletMap | null>(null);
   const gpsToastIdRef = useRef<string | null>(null);
 
-  /* ---------- initialiser pulsikon ---------- */
   useEffect(() => setPulseIcon(createPulseIcon()), []);
 
-  /* ---------- hent Leaflet-instans ---------- */
   const handleMapInstance = useCallback((m: LeafletMap) => {
     mapRef.current = m;
     if (state.currentPosition)
       m.setView([state.currentPosition.lat, state.currentPosition.lng], 16);
   }, [state.currentPosition]);
 
-  /* ---------- be om posisjonstillatelse ---------- */
   const requestLocationPermission = useCallback(() => {
     if (!navigator.geolocation) {
       dispatch({ type: 'LOCATION_ERROR', payload: 'Geolocation unsupported' });
@@ -130,7 +127,6 @@ const RunHomeClient: React.FC = () => {
 
   useEffect(() => { requestLocationPermission(); }, [requestLocationPermission]);
 
-  /* ---------- timer + GPS-watch ---------- */
   useEffect(() => {
     if (state.status === 'running') {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -188,7 +184,6 @@ const RunHomeClient: React.FC = () => {
     };
   }, [state.status, state.gpsSignalLost, dispatch, addToast, t]);
 
-  /* ---------- kontroller ---------- */
   const handleStartRun = () => {
     if (state.currentPosition) dispatch({ type: 'START_RUN', payload: state.currentPosition });
     else {
@@ -256,7 +251,7 @@ const RunHomeClient: React.FC = () => {
             <Button
               variant="primary"
               size="lg"
-              className="w-full max-w-xs mx-auto mb-4"
+              className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
               icon={<PlayIcon />}
               onClick={handleStartRun}
               aria-label={t('RunControls.start')}
@@ -269,7 +264,7 @@ const RunHomeClient: React.FC = () => {
             <Button
               variant="primary"
               size="lg"
-              className="w-full max-w-xs mx-auto mb-4"
+              className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
               icon={<PauseIcon />}
               onClick={() => dispatch({ type: 'PAUSE_RUN' })}
               aria-label={t('RunControls.pause')}
@@ -283,7 +278,7 @@ const RunHomeClient: React.FC = () => {
               <Button
                 variant="primary"
                 size="lg"
-                className="flex-1"
+                className="flex-1 flex items-center justify-center gap-2"
                 icon={<PlayIcon />}
                 onClick={() => dispatch({ type: 'RESUME_RUN' })}
                 aria-label={t('RunControls.resume')}
@@ -293,7 +288,7 @@ const RunHomeClient: React.FC = () => {
               <Button
                 variant="neutral"
                 size="lg"
-                className="flex-1"
+                className="flex-1 flex items-center justify-center gap-2"
                 icon={<StopIcon />}
                 onClick={handleSaveRun}
                 aria-label={t('RunControls.endAndSave')}
