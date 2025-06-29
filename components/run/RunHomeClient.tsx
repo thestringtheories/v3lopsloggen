@@ -29,6 +29,7 @@ import type {
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
+/* ---------- dynamiske Leaflet-importer ---------- */
 const MapContainer = dynamic<MapContainerProps>(() =>
   import('react-leaflet').then((m) => m.MapContainer), { ssr: false });
 const TileLayer    = dynamic<TileLayerProps>(() =>
@@ -40,22 +41,24 @@ const Polyline     = dynamic<PolylineProps>(() =>
 const ZoomControl  = dynamic<ZoomControlProps>(() =>
   import('react-leaflet').then((m) => m.ZoomControl ), { ssr: false });
 
-const PlayIcon  = ({ className='w-8 h-8' }:{className?:string}) => (
+/* ---------- ikon-komponenter ---------- */
+const PlayIcon  = ({ className = 'w-8 h-8' }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" />
   </svg>
 );
-const PauseIcon = ({ className='w-6 h-6' }:{className?:string}) => (
+const PauseIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z" />
   </svg>
 );
-const StopIcon  = ({ className='w-6 h-6' }:{className?:string}) => (
+const StopIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M4.5 7.5a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-9Z" />
   </svg>
 );
 
+/* ---------- puls-ikon for live-posisjon ---------- */
 const createPulseIcon = (): DivIcon | null =>
   typeof window === 'undefined'
     ? null
@@ -66,13 +69,16 @@ const createPulseIcon = (): DivIcon | null =>
         iconAnchor: [10, 10],
       });
 
+/* ===================================================== */
+/*                       KOMPONENT                       */
+/* ===================================================== */
 const RunHomeClient: React.FC = () => {
-  const { state, dispatch } = useRunSession();
-  const t            = useTranslations();
-  const router       = useRouter();
-  const { locale }   = useParams() as { locale: AppLocale };
-  const { user }     = useAuth();
-  const { addToast } = useToast();
+  const { state, dispatch }  = useRunSession();
+  const t                    = useTranslations();
+  const router               = useRouter();
+  const { locale }           = useParams() as { locale: AppLocale };
+  const { user }             = useAuth();
+  const { addToast }         = useToast();
 
   const [showPermOverlay, setShowPermOverlay] = useState(false);
   const [pulseIcon, setPulseIcon]             = useState<DivIcon | null>(null);
@@ -82,14 +88,17 @@ const RunHomeClient: React.FC = () => {
   const mapRef        = useRef<LeafletMap | null>(null);
   const gpsToastIdRef = useRef<string | null>(null);
 
+  /* ---------- init puls-ikon ---------- */
   useEffect(() => setPulseIcon(createPulseIcon()), []);
 
+  /* ---------- map-instans fra child ---------- */
   const handleMapInstance = useCallback((m: LeafletMap) => {
     mapRef.current = m;
     if (state.currentPosition)
       m.setView([state.currentPosition.lat, state.currentPosition.lng], 16);
   }, [state.currentPosition]);
 
+  /* ---------- be om lokasjon ---------- */
   const requestLocationPermission = useCallback(() => {
     if (!navigator.geolocation) {
       dispatch({ type: 'LOCATION_ERROR', payload: 'Geolocation unsupported' });
@@ -120,6 +129,7 @@ const RunHomeClient: React.FC = () => {
 
   useEffect(() => { requestLocationPermission(); }, [requestLocationPermission]);
 
+  /* ---------- timer + GPS-watch ---------- */
   useEffect(() => {
     if (state.status === 'running') {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -135,8 +145,7 @@ const RunHomeClient: React.FC = () => {
           if (state.gpsSignalLost) {
             dispatch({ type: 'GPS_SIGNAL_REACQUIRED' });
             if (gpsToastIdRef.current)
-              addToast(t('HomePage.infoGpsSignalRestored'), 'success',
-                       { id: gpsToastIdRef.current });
+              addToast(t('HomePage.infoGpsSignalRestored'), 'success', { id: gpsToastIdRef.current });
             else addToast(t('HomePage.infoGpsSignalRestored'), 'success');
             gpsToastIdRef.current = null;
           }
@@ -152,18 +161,15 @@ const RunHomeClient: React.FC = () => {
           if (!state.gpsSignalLost) {
             dispatch({ type: 'GPS_SIGNAL_LOST' });
             gpsToastIdRef.current = addToast(
-              t('HomePage.errorGpsSignalLost'),
-              'warning',
-              { duration: 10000 }
+              t('HomePage.errorGpsSignalLost'), 'warning', { duration: 10000 }
             );
           }
         },
         { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
       );
     } else {
-      if (timerRef.current)       clearInterval(timerRef.current);
-      if (watchIdRef.current!==null)
-        navigator.geolocation.clearWatch(watchIdRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (watchIdRef.current !== null) navigator.geolocation.clearWatch(watchIdRef.current);
 
       if (state.gpsSignalLost) {
         if (gpsToastIdRef.current) addToast('', 'blank', { id: gpsToastIdRef.current });
@@ -171,12 +177,12 @@ const RunHomeClient: React.FC = () => {
       }
     }
     return () => {
-      if (timerRef.current)       clearInterval(timerRef.current);
-      if (watchIdRef.current!==null)
-        navigator.geolocation.clearWatch(watchIdRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (watchIdRef.current !== null) navigator.geolocation.clearWatch(watchIdRef.current);
     };
   }, [state.status, state.gpsSignalLost, dispatch, addToast, t]);
 
+  /* ---------- kontroll-handlers (start/pause/save) ---------- */
   const handleStartRun = () => {
     if (state.currentPosition) dispatch({ type: 'START_RUN', payload: state.currentPosition });
     else {
@@ -221,125 +227,133 @@ const RunHomeClient: React.FC = () => {
     }
   };
 
+  /* ---------- render ---------- */
   const showSessionHeader = state.status === 'running' || state.status === 'paused';
 
-  /* ========================== RENDER =========================== */
   return (
     <div className="flex flex-col min-h-screen bg-neutral-100">
-    {showSessionHeader && (
-      <SessionHeader
-        activeDuration={state.activeDuration}
-        route={state.route}
-        gpsSignalLost={state.gpsSignalLost}
-      />
-    )}
+      {showSessionHeader && (
+        <SessionHeader
+          activeDuration={state.activeDuration}
+          route={state.route}
+          gpsSignalLost={state.gpsSignalLost}
+        />
+      )}
 
-    <main className="flex flex-col flex-1 min-h-0">
-      {/* KART – fyller all ledig plass */}
-      <div
-  className="flex-1 min-h-0 w-full rounded-lg overflow-hidden border border-neutral-200 relative"
-  /* NB: beholder relative + minHeight-calc */
-  style={{ minHeight: `calc(100vh - var(--header-h) - var(--nav-h) - 1rem)` }}>
-        <MapContainer
-          center={state.currentPosition
-            ? [state.currentPosition.lat, state.currentPosition.lng]
-            : [59.9139, 10.7522]}
-          zoom={16}
-          className="w-full h-full"
-          style={{ width: "100%", height: "100%" }} // NB!
-          zoomControl={false}
-          whenReady={() => {
-            setTimeout(() => {
-              if (mapRef.current) mapRef.current.invalidateSize();
-            }, 100);
-          }}
+      <main className="flex flex-col flex-1 min-h-0">
+        {/* KART */}
+        <div
+          className="flex-1 min-h-0 w-full rounded-lg overflow-hidden border border-neutral-200 relative"
+          style={{ minHeight: `calc(100vh - var(--header-h) - var(--nav-h) - 1rem)` }}
         >
-          <MapInstanceGrabber onMapInstance={handleMapInstance} />
-          <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          />
-          {state.route.length > 1 && (
-            <Polyline
-              pathOptions={{ color: '#14b8a6', weight: 5, opacity: 0.9 }}
-              positions={state.route.map((p) => [p.lat, p.lng] as [number, number])}
-            />
-          )}
-          {state.currentPosition && (
-            <Marker
-              position={[state.currentPosition.lat, state.currentPosition.lng]}
-              icon={pulseIcon ?? undefined}
-            />
-          )}
-          <ZoomControl position="bottomright" />
-        </MapContainer>
-      </div>
-
-      {/* FAB / handling-knapper */}
-      <FABwrapper>
-        {state.status === 'idle' && !state.error && state.currentPosition && (
-          <Button
-            variant="primary"
-            size="lg"
-            className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
-            icon={<PlayIcon />}
-            onClick={handleStartRun}
-            aria-label={t('RunControls.start')}
+          <MapContainer
+            id="live-map"
+            center={state.currentPosition
+              ? [state.currentPosition.lat, state.currentPosition.lng]
+              : [59.9139, 10.7522]}
+            zoom={16}
+            className="w-full h-full"
+            style={{ width: '100%', height: '100%' }}
+            zoomControl={false}
+            whenReady={() => setTimeout(() => mapRef.current?.invalidateSize(), 100)}
           >
-            {t('RunControls.start')}
-          </Button>
-        )}
+            <MapInstanceGrabber onMapInstance={handleMapInstance} />
+            <TileLayer
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            />
+            {state.route.length > 1 && (
+              <Polyline
+                pathOptions={{ color: '#14b8a6', weight: 5, opacity: 0.9 }}
+                positions={state.route.map((p) => [p.lat, p.lng] as [number, number])}
+              />
+            )}
+            {state.currentPosition && (
+              <Marker
+                position={[state.currentPosition.lat, state.currentPosition.lng]}
+                icon={pulseIcon ?? undefined}
+              />
+            )}
+            <ZoomControl position="bottomright" />
+          </MapContainer>
+        </div>
 
-        {state.status === 'running' && (
-          <Button
-            variant="primary"
-            size="lg"
-            className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
-            icon={<PauseIcon />}
-            onClick={() => dispatch({ type: 'PAUSE_RUN' })}
-            aria-label={t('RunControls.pause')}
-          >
-            {t('RunControls.pause')}
-          </Button>
-        )}
-
-        {state.status === 'paused' && (
-          <div className="flex w-full max-w-xs mx-auto mb-4 gap-4">
+        {/* FAB / knapper */}
+        <FABwrapper>
+          {state.status === 'idle' && !state.error && state.currentPosition && (
             <Button
               variant="primary"
               size="lg"
-              className="flex-1 flex items-center justify-center gap-2"
+              className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
               icon={<PlayIcon />}
-              onClick={() => dispatch({ type: 'RESUME_RUN' })}
-              aria-label={t('RunControls.resume')}
+              onClick={handleStartRun}
+              aria-label={t('RunControls.start')}
             >
-              {t('RunControls.resume')}
+              {t('RunControls.start')}
             </Button>
+          )}
+
+          {state.status === 'running' && (
             <Button
-              variant="neutral"
+              variant="primary"
               size="lg"
-              className="flex-1 flex items-center justify-center gap-2"
-              icon={<StopIcon />}
-              onClick={handleSaveRun}
-              aria-label={t('RunControls.endAndSave')}
+              className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
+              icon={<PauseIcon />}
+              onClick={() => dispatch({ type: 'PAUSE_RUN' })}
+              aria-label={t('RunControls.pause')}
             >
-              {t('RunControls.endAndSave')}
+              {t('RunControls.pause')}
             </Button>
-          </div>
-        )}
-      </FABwrapper>
-    </main>
+          )}
 
-    <style jsx global>{`
-  .custom-pulse-icon div { animation: customPulse 1.75s infinite cubic-bezier(0.66,0,0,1); }
-  @keyframes customPulse { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.7;} }
+          {state.status === 'paused' && (
+            <div className="flex w-full max-w-xs mx-auto mb-4 gap-4">
+              <Button
+                variant="primary"
+                size="lg"
+                className="flex-1 flex items-center justify-center gap-2"
+                icon={<PlayIcon />}
+                onClick={() => dispatch({ type: 'RESUME_RUN' })}
+                aria-label={t('RunControls.resume')}
+              >
+                {t('RunControls.resume')}
+              </Button>
+              <Button
+                variant="neutral"
+                size="lg"
+                className="flex-1 flex items-center justify-center gap-2"
+                icon={<StopIcon />}
+                onClick={handleSaveRun}
+                aria-label={t('RunControls.endAndSave')}
+              >
+                {t('RunControls.endAndSave')}
+              </Button>
+            </div>
+          )}
+        </FABwrapper>
+      </main>
 
-  .leaflet-container{height:100%;width:100%;}
-  .leaflet-control-zoom{border:none!important;box-shadow:0 2px 8px rgb(0 0 0 / .2)!important;}
-  .leaflet-control-zoom a{background:#fff!important;color:#334155!important;border-bottom:1px solid #e2e8f0!important;}
-  .leaflet-control-zoom a:hover{background:#f1f5f9!important;}
-`}</style>
-  </div>
+      {/* Global styles */}
+      <style jsx global>{`
+        .custom-pulse-icon div { animation: customPulse 1.75s infinite cubic-bezier(0.66,0,0,1); }
+        @keyframes customPulse { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.7;} }
+
+        /* Leaflet: absolutt posisjon inni wrapper, men bak UI */
+        #live-map { position: absolute; inset: 0; z-index: 0; }
+
+        .leaflet-container { height: 100%; width: 100%; }
+        .leaflet-control-zoom {
+          border: none !important;
+          box-shadow: 0 2px 8px rgb(0 0 0 / .2) !important;
+        }
+        .leaflet-control-zoom a {
+          background: #fff !important;
+          color: #334155 !important;
+          border-bottom: 1px solid #e2e8f0 !important;
+        }
+        .leaflet-control-zoom a:hover { background: #f1f5f9 !important; }
+      `}</style>
+    </div>
   );
 };
 
