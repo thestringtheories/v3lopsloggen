@@ -1,7 +1,12 @@
 // components/run/RunHomeClient.tsx
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from 'react';
 import { useRunSession } from './RunSessionProvider';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
@@ -18,6 +23,7 @@ import { useToast } from '@/components/ui/ToastProvider';
 import MapInstanceGrabber from './MapInstanceGrabber';
 import FABwrapper from './FABWrapper';
 import Button from '@/components/ui/Button';
+import SaveRunSheet from './SaveRunSheet';                // NEW
 
 import L, { DivIcon, Map as LeafletMap } from 'leaflet';
 import type {
@@ -79,6 +85,9 @@ const RunHomeClient: React.FC = () => {
   const { locale }           = useParams() as { locale: AppLocale };
   const { user }             = useAuth();
   const { addToast }         = useToast();
+
+  /* ---------- NYTT state for sheet ---------- */
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const [showPermOverlay, setShowPermOverlay] = useState(false);
   const [pulseIcon, setPulseIcon]             = useState<DivIcon | null>(null);
@@ -227,6 +236,13 @@ const RunHomeClient: React.FC = () => {
     }
   };
 
+  /* ---------- handler for Delete i sheet ---------- */
+  const handleDeleteRun = () => {
+    dispatch({ type: 'RESET_RUN' });
+    addToast(t('run.deleted'), 'info');
+    setSheetOpen(false);
+  };
+
   /* ---------- render ---------- */
   const showSessionHeader = state.status === 'running' || state.status === 'paused';
 
@@ -318,12 +334,13 @@ const RunHomeClient: React.FC = () => {
               >
                 {t('RunControls.resume')}
               </Button>
+              {/* Avslutt-knappen åpner nå sheet i stedet for direkte lagring */}
               <Button
                 variant="neutral"
                 size="lg"
                 className="flex-1 flex items-center justify-center gap-2"
                 icon={<StopIcon />}
-                onClick={handleSaveRun}
+                onClick={() => setSheetOpen(true)}
                 aria-label={t('RunControls.endAndSave')}
               >
                 {t('RunControls.endAndSave')}
@@ -332,6 +349,17 @@ const RunHomeClient: React.FC = () => {
           )}
         </FABwrapper>
       </main>
+
+      {/* Bottom-sheet med kart + stats + Lagre / Slett */}
+      <SaveRunSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onSave={async () => {
+          setSheetOpen(false);
+          await handleSaveRun();
+        }}
+        onDelete={handleDeleteRun}
+      />
 
       {/* Global styles */}
       <style jsx global>{`

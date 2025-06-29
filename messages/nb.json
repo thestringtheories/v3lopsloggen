@@ -2,6 +2,7 @@
   "RootLayout": {
     "title": "Løpsloggen - Løpe App"
   },
+
   "HomePage": {
     "welcome": "Velkommen til Løpsloggen!",
     "description": "Din løpereise starter her.",
@@ -12,6 +13,7 @@
     "errorGpsSignalLost": "GPS-signal midlertidig tapt. Prøver å koble til på nytt...",
     "infoGpsSignalRestored": "GPS-signal gjenopprettet."
   },
+
   "RunControls": {
     "start": "Start økt",
     "pause": "Pause økt",
@@ -19,6 +21,13 @@
     "endAndSave": "Avslutt",
     "saving": "Lagrer..."
   },
+
+  "run": {
+    "save": "Lagre",
+    "delete": "Slett",
+    "deleted": "Økten ble slettet"
+  },
+
   "LiveStatsBar": {
     "time": "Tid",
     "distance": "Distanse",
@@ -28,6 +37,7 @@
     "gpsStatus": "GPS",
     "gpsPoor": "Svakt Signal"
   },
+
   "SummaryPage": {
     "title": "Oppsummering av økt",
     "yourRun": "Din løpetur",
@@ -41,6 +51,7 @@
     "loadingRun": "Laster løpsdata...",
     "errorLoadingDetails": "Kunne ikke laste øktdetaljer. Vennligst prøv igjen."
   },
+
   "HistoryPage": {
     "title": "Løpshistorikk",
     "loadingRuns": "Laster dine løpeturer...",
@@ -49,6 +60,7 @@
     "runOn": "Løpt den",
     "viewSummary": "Se oppsummering"
   },
+
   "BottomNav": {
     "home": "Hjem",
     "history": "Historikk",
@@ -58,10 +70,12 @@
     "start": "Løp",
     "ariaStart": "Start en ny løpetur"
   },
+
   "Firebase": {
     "saveSuccess": "Økt lagret!",
     "saveError": "Kunne ikke lagre økten. Prøv igjen."
   },
+
   "Auth": {
     "loginTitle": "Løpsloggen",
     "emailLabel": "E-post",
@@ -80,6 +94,7 @@
     "errorTooManyRequests": "Tilgang til denne kontoen er midlertidig deaktivert på grunn av mange mislykkede påloggingsforsøk. Du kan gjenopprette den umiddelbart ved å tilbakestille passordet ditt, eller du kan prøve igjen senere.",
     "errorGeneric": "En uventet feil oppstod. Vennligst prøv igjen."
   },
+
   "Toast": {
     "close": "Lukk varsel"
   }
