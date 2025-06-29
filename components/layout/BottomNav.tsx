@@ -4,7 +4,8 @@
 import React from 'react';
 import { Link, usePathname } from '@/app/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Home, List, Play } from 'lucide-react';
+import { Home, List, Icon } from 'lucide-react';
+import { sneaker } from '@lucide/lab';          // løpesko-ikonet
 
 /* ------------------------------------------------------------------
    Bottom navigation bar
@@ -33,7 +34,6 @@ const BottomNav: React.FC = () => {
 
   const isActive = (href: string) => pathname === href;
 
-  /* --- hent ikon-komponentene i variabler ------------------------------ */
   const LeftIcon = tabs[0].Icon;
   const RightIcon = tabs[1].Icon;
 
@@ -64,7 +64,7 @@ const BottomNav: React.FC = () => {
             </Link>
           </li>
 
-          {/* Midt-CTA – bare ikon ---------------------------------------- */}
+          {/* Midt-CTA – løpesko-ikon ------------------------------------ */}
           <li className="flex-1">
             <Link
               href="/"
@@ -72,7 +72,7 @@ const BottomNav: React.FC = () => {
               className="flex h-full flex-col items-center justify-center p-2
                          text-primary hover:text-primary-light transition-colors duration-150"
             >
-              <Play className="h-6 w-6" />
+              <Icon iconNode={sneaker} className="h-6 w-6" />
             </Link>
           </li>
 
