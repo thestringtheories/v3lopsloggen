@@ -73,7 +73,6 @@ const createPulseIcon = (): DivIcon | null =>
 /*                            KOMPONENT                          */
 /* ============================================================= */
 const RunHomeClient: React.FC = () => {
-  /* ----- hooks, state, GPS-håndtering (uendret) ----- */
   const { state, dispatch } = useRunSession();
   const t            = useTranslations();
   const router       = useRouter();
@@ -228,8 +227,6 @@ const RunHomeClient: React.FC = () => {
     }
   };
 
-  const polyline = state.route.map((p) => [p.lat, p.lng] as [number, number]);
-
   /* ========================== RENDER =========================== */
   return (
     <div className="flex flex-col min-h-screen bg-neutral-100">
@@ -242,8 +239,41 @@ const RunHomeClient: React.FC = () => {
       )}
 
       <main className="relative flex-1 pb-[calc(var(--nav-h)_+_1rem)]">
-        {/* kart-wrapper og overlays uendret */}
-        {/* … */}
+        {/* LEAFLET-KART */}
+        <div className="h-80 w-full rounded-lg overflow-hidden border border-neutral-200 mb-6">
+          <MapContainer
+            center={state.currentPosition
+              ? [state.currentPosition.lat, state.currentPosition.lng]
+              : [59.9139, 10.7522]}
+            zoom={16}
+            className="w-full h-full"
+            zoomControl={false}
+            whenReady={() => {
+              setTimeout(() => {
+                if (mapRef.current) mapRef.current.invalidateSize();
+              }, 100);
+            }}
+          >
+            <MapInstanceGrabber onMapInstance={handleMapInstance} />
+            <TileLayer
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            />
+            {state.route.length > 1 && (
+              <Polyline
+                pathOptions={{ color: '#14b8a6', weight: 5, opacity: 0.9 }}
+                positions={state.route.map((p) => [p.lat, p.lng] as [number, number])}
+              />
+            )}
+            {state.currentPosition && (
+              <Marker
+                position={[state.currentPosition.lat, state.currentPosition.lng]}
+                icon={pulseIcon ?? undefined}
+              />
+            )}
+            <ZoomControl position="bottomright" />
+          </MapContainer>
+        </div>
 
         {/* FAB / handling-knapper */}
         <FABwrapper>
