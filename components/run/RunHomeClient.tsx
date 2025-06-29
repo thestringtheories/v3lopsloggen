@@ -238,6 +238,7 @@ const RunHomeClient: React.FC = () => {
       {/* KART – fyller all ledig plass */}
       <div className="flex-1 min-h-0 w-full rounded-lg overflow-hidden border border-neutral-200">
         <MapContainer
+          id="live-map"
           center={state.currentPosition
             ? [state.currentPosition.lat, state.currentPosition.lng]
             : [59.9139, 10.7522]}
@@ -328,13 +329,20 @@ const RunHomeClient: React.FC = () => {
     </main>
 
     <style jsx global>{`
-      .custom-pulse-icon div { animation: customPulse 1.75s infinite cubic-bezier(0.66,0,0,1); }
-      @keyframes customPulse { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.7;} }
-      .leaflet-container{height:100%;width:100%;}
-      .leaflet-control-zoom{border:none!important;box-shadow:0 2px 8px rgb(0 0 0 / .2)!important;}
-      .leaflet-control-zoom a{background:#fff!important;color:#334155!important;border-bottom:1px solid #e2e8f0!important;}
-      .leaflet-control-zoom a:hover{background:#f1f5f9!important;}
-    `}</style>
+  .custom-pulse-icon div { animation: customPulse 1.75s infinite cubic-bezier(0.66,0,0,1); }
+  @keyframes customPulse { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.7;} }
+
+  /* Leaflet hard-fix: fyll ALLTID foreldren sin boks */
+  #live-map {
+    position: absolute;   /* strekker seg i flex-boksen */
+    inset: 0;             /* top:0; right:0; bottom:0; left:0 */
+  }
+
+  .leaflet-container{height:100%;width:100%;}
+  .leaflet-control-zoom{border:none!important;box-shadow:0 2px 8px rgb(0 0 0 / .2)!important;}
+  .leaflet-control-zoom a{background:#fff!important;color:#334155!important;border-bottom:1px solid #e2e8f0!important;}
+  .leaflet-control-zoom a:hover{background:#f1f5f9!important;}
+`}</style>
   </div>
   );
 };
