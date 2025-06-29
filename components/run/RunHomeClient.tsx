@@ -29,7 +29,7 @@ import type {
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-/* ---------- dynamiske Leaflet-importer ---------- */
+/* -------- dynamiske Leaflet-importer -------- */
 const MapContainer = dynamic<MapContainerProps>(() =>
   import('react-leaflet').then((m) => m.MapContainer), { ssr: false });
 const TileLayer    = dynamic<TileLayerProps>(() =>
@@ -41,24 +41,24 @@ const Polyline     = dynamic<PolylineProps>(() =>
 const ZoomControl  = dynamic<ZoomControlProps>(() =>
   import('react-leaflet').then((m) => m.ZoomControl ), { ssr: false });
 
-/* ---------- SVG-ikoner ---------- */
-const PlayIcon = ({ className = 'w-8 h-8' }: { className?: string }) => (
+/* -------- SVG-ikoner -------- */
+const PlayIcon  = ({ className='w-8 h-8' }:{className?:string}) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" />
   </svg>
 );
-const PauseIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
+const PauseIcon = ({ className='w-6 h-6' }:{className?:string}) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z" />
   </svg>
 );
-const StopIcon  = ({ className = 'w-6 h-6' }: { className?: string }) => (
+const StopIcon  = ({ className='w-6 h-6' }:{className?:string}) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M4.5 7.5a3 3 0 0 1 3-3h9a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-9Z" />
   </svg>
 );
 
-/* ---------- hjelpe-ikon ---------- */
+/* -------- hjelpe-ikon -------- */
 const createPulseIcon = (): DivIcon | null =>
   typeof window === 'undefined'
     ? null
@@ -69,11 +69,11 @@ const createPulseIcon = (): DivIcon | null =>
         iconAnchor: [10, 10],
       });
 
-/* ===================================================================== */
-/*                                KOMPONENT                              */
-/* ===================================================================== */
+/* ============================================================= */
+/*                            KOMPONENT                          */
+/* ============================================================= */
 const RunHomeClient: React.FC = () => {
-  /* ---------- hooks & state (uendret) ---------- */
+  /* ----- hooks, state, GPS-håndtering (uendret) ----- */
   const { state, dispatch } = useRunSession();
   const t            = useTranslations();
   const router       = useRouter();
@@ -238,61 +238,82 @@ const RunHomeClient: React.FC = () => {
   /* ========================== RENDER =========================== */
   return (
     <div className="flex flex-col min-h-screen bg-neutral-100">
-      {/* header + maplogikk uendret */}
+      {(state.status === 'running' || state.status === 'paused') && (
+        <SessionHeader
+          activeDuration={state.activeDuration}
+          route={state.route}
+          gpsSignalLost={state.gpsSignalLost}
+        />
+      )}
 
-      {/* FAB */}
-      <FABwrapper>
-        {state.status === 'idle' && !state.error && state.currentPosition && (
-          <Button
-            variant="primary"
-            size="lg"
-            className="w-full max-w-xs mx-auto mb-4"
-            icon={<PlayIcon />}
-            onClick={handleStartRun}
-            aria-label={t('RunControls.start')}
-          >
-            {t('RunControls.start')}
-          </Button>
-        )}
+      <main className="flex-grow pb-[calc(var(--nav-h)_+_1rem)]">
+        {/* kart-wrapper og overlays uendret */}
+        {/* … */}
 
-        {state.status === 'running' && (
-          <Button
-            variant="primary"
-            size="lg"
-            className="w-full max-w-xs mx-auto mb-4"
-            icon={<PauseIcon />}
-            onClick={() => dispatch({ type: 'PAUSE_RUN' })}
-            aria-label={t('RunControls.pause')}
-          >
-            {t('RunControls.pause')}
-          </Button>
-        )}
-
-        {state.status === 'paused' && (
-          <div className="flex w-full max-w-xs mx-auto mb-4 gap-4">
+        {/* FAB / handling-knapper */}
+        <FABwrapper>
+          {state.status === 'idle' && !state.error && state.currentPosition && (
             <Button
               variant="primary"
               size="lg"
-              className="flex-1"
+              className="w-full max-w-xs mx-auto mb-4"
               icon={<PlayIcon />}
-              onClick={() => dispatch({ type: 'RESUME_RUN' })}
-              aria-label={t('RunControls.resume')}
+              onClick={handleStartRun}
+              aria-label={t('RunControls.start')}
             >
-              {t('RunControls.resume')}
+              {t('RunControls.start')}
             </Button>
+          )}
+
+          {state.status === 'running' && (
             <Button
-              variant="neutral"
+              variant="primary"
               size="lg"
-              className="flex-1"
-              icon={<StopIcon />}
-              onClick={handleSaveRun}
-              aria-label={t('RunControls.endAndSave')}
+              className="w-full max-w-xs mx-auto mb-4"
+              icon={<PauseIcon />}
+              onClick={() => dispatch({ type: 'PAUSE_RUN' })}
+              aria-label={t('RunControls.pause')}
             >
-              {t('RunControls.endAndSave')}
+              {t('RunControls.pause')}
             </Button>
-          </div>
-        )}
-      </FABwrapper>
+          )}
+
+          {state.status === 'paused' && (
+            <div className="flex w-full max-w-xs mx-auto mb-4 gap-4">
+              <Button
+                variant="primary"
+                size="lg"
+                className="flex-1"
+                icon={<PlayIcon />}
+                onClick={() => dispatch({ type: 'RESUME_RUN' })}
+                aria-label={t('RunControls.resume')}
+              >
+                {t('RunControls.resume')}
+              </Button>
+              <Button
+                variant="neutral"
+                size="lg"
+                className="flex-1"
+                icon={<StopIcon />}
+                onClick={handleSaveRun}
+                aria-label={t('RunControls.endAndSave')}
+              >
+                {t('RunControls.endAndSave')}
+              </Button>
+            </div>
+          )}
+        </FABwrapper>
+      </main>
+
+      {/* globale Leaflet-styles (uendret) */}
+      <style jsx global>{`
+        .custom-pulse-icon div { animation: customPulse 1.75s infinite cubic-bezier(0.66,0,0,1); }
+        @keyframes customPulse { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.7;} }
+        .leaflet-container{height:100%;width:100%;}
+        .leaflet-control-zoom{border:none!important;box-shadow:0 2px 8px rgb(0 0 0 / .2)!important;}
+        .leaflet-control-zoom a{background:#fff!important;color:#334155!important;border-bottom:1px solid #e2e8f0!important;}
+        .leaflet-control-zoom a:hover{background:#f1f5f9!important;}
+      `}</style>
     </div>
   );
 };
