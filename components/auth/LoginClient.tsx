@@ -181,9 +181,9 @@ const LoginClient: React.FC = () => {
       style={{ backgroundImage: "url('/images/login-background.jpg')" }}
       role="main"
     >
-      <div className="w-full max-w-md p-8 sm:p-10 bg-neutral-900 bg-opacity-80 backdrop-blur-xl rounded-2xl shadow-2xl">
+      <div className="glass-card w-full max-w-md p-8 sm:p-10">
         <div className="text-center mb-8">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-light to-secondary">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-primary">
             {getPageTitle()}
           </h1>
         </div>
