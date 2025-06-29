@@ -29,7 +29,6 @@ import type {
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-/* -------- dynamiske Leaflet-importer -------- */
 const MapContainer = dynamic<MapContainerProps>(() =>
   import('react-leaflet').then((m) => m.MapContainer), { ssr: false });
 const TileLayer    = dynamic<TileLayerProps>(() =>
@@ -41,7 +40,6 @@ const Polyline     = dynamic<PolylineProps>(() =>
 const ZoomControl  = dynamic<ZoomControlProps>(() =>
   import('react-leaflet').then((m) => m.ZoomControl ), { ssr: false });
 
-/* -------- SVG-ikoner -------- */
 const PlayIcon  = ({ className='w-8 h-8' }:{className?:string}) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" />
@@ -58,7 +56,6 @@ const StopIcon  = ({ className='w-6 h-6' }:{className?:string}) => (
   </svg>
 );
 
-/* -------- hjelpe-ikon -------- */
 const createPulseIcon = (): DivIcon | null =>
   typeof window === 'undefined'
     ? null
@@ -69,9 +66,6 @@ const createPulseIcon = (): DivIcon | null =>
         iconAnchor: [10, 10],
       });
 
-/* ============================================================= */
-/*                            KOMPONENT                          */
-/* ============================================================= */
 const RunHomeClient: React.FC = () => {
   const { state, dispatch } = useRunSession();
   const t            = useTranslations();
@@ -227,10 +221,21 @@ const RunHomeClient: React.FC = () => {
     }
   };
 
+  // ---- NYTT: Juster kart-høyde dynamisk basert på SessionHeader ----
+  const showSessionHeader = state.status === 'running' || state.status === 'paused';
+  const mapHeight = showSessionHeader ? 'h-[170px] md:h-[240px]' : 'h-80 md:h-96';
+
+  // ---- NYTT: Kall invalidateSize() på kart når header vises/skjules ----
+  useEffect(() => {
+    if (mapRef.current) {
+      setTimeout(() => mapRef.current?.invalidateSize(), 300);
+    }
+  }, [showSessionHeader]);
+
   /* ========================== RENDER =========================== */
   return (
     <div className="flex flex-col min-h-screen bg-neutral-100">
-      {(state.status === 'running' || state.status === 'paused') && (
+      {showSessionHeader && (
         <SessionHeader
           activeDuration={state.activeDuration}
           route={state.route}
@@ -240,7 +245,7 @@ const RunHomeClient: React.FC = () => {
 
       <main className="relative flex-1 pb-[calc(var(--nav-h)_+_1rem)]">
         {/* LEAFLET-KART */}
-        <div className="h-80 w-full rounded-lg overflow-hidden border border-neutral-200 mb-6">
+        <div className={`${mapHeight} w-full rounded-lg overflow-hidden border border-neutral-200 mb-6 transition-all duration-300`}>
           <MapContainer
             center={state.currentPosition
               ? [state.currentPosition.lat, state.currentPosition.lng]
@@ -330,7 +335,6 @@ const RunHomeClient: React.FC = () => {
         </FABwrapper>
       </main>
 
-      {/* globale Leaflet-styles (uendret) */}
       <style jsx global>{`
         .custom-pulse-icon div { animation: customPulse 1.75s infinite cubic-bezier(0.66,0,0,1); }
         @keyframes customPulse { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.7;} }
