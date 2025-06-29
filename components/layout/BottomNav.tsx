@@ -10,7 +10,7 @@ import { sneaker } from '@lucide/lab';          // løpesko-ikonet
 /* ------------------------------------------------------------------
    Bottom navigation bar
    – Venstre : Hjem      (/)
-   – Midten  : Start CTA (/ – peker foreløpig til samme side)
+   – Midten  : Løp-CTA   (/ – peker foreløpig til samme side)
    – Høyre   : Historikk (/history)
 -------------------------------------------------------------------*/
 const BottomNav: React.FC = () => {
@@ -34,13 +34,12 @@ const BottomNav: React.FC = () => {
 
   const isActive = (href: string) => pathname === href;
 
-  const LeftIcon = tabs[0].Icon;
+  const LeftIcon  = tabs[0].Icon;
   const RightIcon = tabs[1].Icon;
 
   return (
     <footer
-      className="fixed inset-x-0 bottom-0 z-50
-                 bg-white/95 backdrop-blur-sm
+      className="fixed inset-x-0 bottom-0 z-50 bg-white/95 backdrop-blur-sm
                  border-t border-neutral-200 shadow-top-md
                  pb-[env(safe-area-inset-bottom)]"
       style={{ height: 'var(--nav-h)' }}
@@ -64,15 +63,16 @@ const BottomNav: React.FC = () => {
             </Link>
           </li>
 
-          {/* Midt-CTA – løpesko-ikon ------------------------------------ */}
+          {/* Midt-CTA – løpesko + label ---------------------------------- */}
           <li className="flex-1">
             <Link
               href="/"
-              aria-label={t('BottomNav.ariaStart', { defaultValue: 'Start' })}
-              className="flex h-full flex-col items-center justify-center p-2
+              aria-label={t('BottomNav.ariaStart', { defaultValue: 'Start løp' })}
+              className="group flex h-full flex-col items-center justify-center p-2
                          text-primary hover:text-primary-light transition-colors duration-150"
             >
-              <Icon iconNode={sneaker} className="h-6 w-6" />
+              <Icon iconNode={sneaker} className="h-6 w-6 mb-0.5" />
+              <span className="text-xs font-medium">{t('BottomNav.start')}</span>
             </Link>
           </li>
 
