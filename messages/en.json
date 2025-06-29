@@ -16,8 +16,8 @@
   "RunControls": {
     "start": "Start økt",
     "pause": "Pause økt",
-    "resume": "Gjenoppta økt",
-    "endAndSave": "Avslutt og lagre økt",
+    "resume": "Fortsett",
+    "endAndSave": "Avslutt",
     "saving": "Lagrer..."
   },
   "LiveStatsBar": {
