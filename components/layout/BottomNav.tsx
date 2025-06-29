@@ -8,9 +8,9 @@ import { Home, List, PlayCircle } from 'lucide-react';
 
 /* ------------------------------------------------------------------
    Bottom navigation bar
-   – Venstre: Feed          (/)
-   – Midten : Start-knapp   (/run)
-   – Høyre  : Historikk     (/history)
+   – Venstre : Feed      (/)
+   – Midten  : Start CTA (/  – kan endres til anker/handler senere)
+   – Høyre   : Historikk (/history)
 -------------------------------------------------------------------*/
 const BottomNav: React.FC = () => {
   const t = useTranslations();
@@ -44,7 +44,7 @@ const BottomNav: React.FC = () => {
     >
       <nav className="h-full">
         <ul className="flex items-center justify-around h-full">
-          {/* Venstre fane(r) -------------------------------------------------- */}
+          {/* Venstre fane ----------------------------------------------------- */}
           {navItems.slice(0, 1).map(({ href, Icon, labelKey, ariaLabelKey }) => (
             <li key={href} className="flex-1">
               <Link
@@ -63,20 +63,21 @@ const BottomNav: React.FC = () => {
             </li>
           ))}
 
-          {/* Midt-CTA (Start) -------------------------------------------------- */}
-          <li className="-translate-y-3">
+          {/* Midt-CTA (Start) – samme linjehøyde/størrelse -------------------- */}
+          <li className="flex-1">
             <Link
-              href="/run"
+              href="/"
               aria-label={t('BottomNav.ariaStart', { defaultValue: 'Start run' })}
-              className="flex h-16 w-16 items-center justify-center rounded-full
-                         bg-primary text-white shadow-lg
-                         hover:bg-primary-light active:scale-95 transition"
+              className="group flex h-full flex-col items-center justify-center p-2 transition
+                         duration-150 ease-in-out text-primary hover:text-primary-light"
             >
-              <PlayCircle className="h-8 w-8" />
+              {/* Ikonet er fylt oransje for å skille seg ut */}
+              <PlayCircle className="h-6 w-6 mb-0.5" fill="currentColor" />
+              <span className="text-xs font-medium">{t('BottomNav.start', { defaultValue: 'Start' })}</span>
             </Link>
           </li>
 
-          {/* Høyre fane(r) ---------------------------------------------------- */}
+          {/* Høyre fane ------------------------------------------------------ */}
           {navItems.slice(1).map(({ href, Icon, labelKey, ariaLabelKey }) => (
             <li key={href} className="flex-1">
               <Link
