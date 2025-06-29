@@ -14,6 +14,11 @@
   /* Avstand som sikrer klaring for BottomNav + iOS-Home-indikator */
   --safe-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
 
+  /* Brand-farger (hentes fra Tailwind-paletten) */
+  --color-primary: theme(colors.primary.DEFAULT);
+  --color-primary-light: theme(colors.primary.light);
+  --color-primary-dark: theme(colors.primary.dark);
+
   /* Font-utjevning */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -94,6 +99,14 @@ body {
   }
 
   /* ----------------------------------------------------------------
+     NY: .glass-card
+     Halvtransparent hvit bakgrunn + blur til kort og overlays
+  -----------------------------------------------------------------*/
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md shadow-lg rounded-2xl;
+  }
+
+  /* ----------------------------------------------------------------
      NY: safe-fixed-bottom
      Gir padding-bottom som matcher --safe-bottom, slik at
      full-bredde knapper ikke kolliderer med BottomNav + Home-indikator.
@@ -101,4 +114,9 @@ body {
   .safe-fixed-bottom {
     padding-bottom: var(--safe-bottom);
   }
+}
+
+/* Dark-mode-variant for .glass-card – legger seg utenfor @layer */
+.dark .glass-card {
+  background-color: rgba(23, 23, 23, 0.8);
 }

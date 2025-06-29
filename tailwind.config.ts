@@ -1,4 +1,3 @@
-
 import type { Config } from 'tailwindcss';
 
 // Declare require for TypeScript to recognize it in this context
@@ -12,16 +11,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        /* ---------- BRAND COLORS ---------- */
         primary: {
-          light: '#2dd4bf', // teal-400
-          DEFAULT: '#14b8a6', // teal-500
-          dark: '#0d9488', // teal-600
+          light: '#ff7a33',   // hover / gradient-start
+          DEFAULT: '#ff5800', // main brand color
+          dark: '#cc4700',    // focus-ring / dark-mode
         },
         secondary: {
           light: '#f0abfc', // fuchsia-300
           DEFAULT: '#e879f9', // fuchsia-400
           dark: '#d946ef', // fuchsia-500
         },
+
+        /* ---------- NEUTRALS ---------- */
         neutral: {
           50: '#f8fafc',  // slate-50
           100: '#f1f5f9', // slate-100
@@ -35,23 +37,28 @@ const config: Config = {
           900: '#0f172a', // slate-900
           950: '#020617', // slate-950
         },
+
+        /* ---------- STATUS COLORS ---------- */
         success: '#22c55e', // green-500
         error: '#ef4444',   // red-500
         warning: '#f97316', // orange-500
       },
+
+      /* ---------- RADII & SHADOWS ---------- */
       borderRadius: {
-        'xl': '0.75rem', // 12px
-        '2xl': '1rem',   // 16px
+        xl: '0.75rem',  // 12px
+        '2xl': '1rem',  // 16px
         '3xl': '1.5rem', // 24px
       },
       boxShadow: {
-        'top-lg': '0 -10px 15px -3px rgb(0 0 0 / 0.1), 0 -4px 6px -4px rgb(0 0 0 / 0.1)',
-        'top-md': '0 -4px 6px -1px rgb(0 0 0 / 0.1), 0 -2px 4px -2px rgb(0 0 0 / 0.1)'
-      }
+        'top-lg':
+          '0 -10px 15px -3px rgb(0 0 0 / 0.1), 0 -4px 6px -4px rgb(0 0 0 / 0.1)',
+        'top-md':
+          '0 -4px 6px -1px rgb(0 0 0 / 0.1), 0 -2px 4px -2px rgb(0 0 0 / 0.1)',
+      },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-  ],
+  plugins: [require('@tailwindcss/forms')],
 };
+
 export default config;
