@@ -4,35 +4,38 @@
 import React from 'react';
 import { Link, usePathname } from '@/app/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Home, List, PlayCircle } from 'lucide-react';
+import { Home, List, Play } from 'lucide-react';
 
 /* ------------------------------------------------------------------
    Bottom navigation bar
-   – Venstre : Feed      (/)
-   – Midten  : Start CTA (/  – kan endres til anker/handler senere)
+   – Venstre : Hjem      (/)
+   – Midten  : Start CTA (/ – peker foreløpig til samme side)
    – Høyre   : Historikk (/history)
 -------------------------------------------------------------------*/
 const BottomNav: React.FC = () => {
   const t = useTranslations();
   const pathname = usePathname();
 
-  /** Ikon-tabs på hver side av CTA-knappen */
-  const navItems = [
+  const tabs = [
     {
       href: '/',
-      labelKey: 'BottomNav.home',
-      ariaLabelKey: 'BottomNav.ariaHome',
+      label: t('BottomNav.home'),
+      aria: t('BottomNav.ariaHome'),
       Icon: Home,
     },
     {
       href: '/history',
-      labelKey: 'BottomNav.history',
-      ariaLabelKey: 'BottomNav.ariaHistory',
+      label: t('BottomNav.history'),
+      aria: t('BottomNav.ariaHistory'),
       Icon: List,
     },
   ];
 
   const isActive = (href: string) => pathname === href;
+
+  /* --- hent ikon-komponentene i variabler ------------------------------ */
+  const LeftIcon = tabs[0].Icon;
+  const RightIcon = tabs[1].Icon;
 
   return (
     <footer
@@ -43,58 +46,52 @@ const BottomNav: React.FC = () => {
       style={{ height: 'var(--nav-h)' }}
     >
       <nav className="h-full">
-        <ul className="flex items-center justify-around h-full">
-          {/* Venstre fane ----------------------------------------------------- */}
-          {navItems.slice(0, 1).map(({ href, Icon, labelKey, ariaLabelKey }) => (
-            <li key={href} className="flex-1">
-              <Link
-                href={href}
-                aria-label={t(ariaLabelKey)}
-                className={`group flex h-full flex-col items-center justify-center p-2 transition-colors
-                            duration-150 ease-in-out ${
-                              isActive(href)
-                                ? 'text-primary'
-                                : 'text-neutral-500 hover:text-neutral-700'
-                            }`}
-              >
-                <Icon className="h-6 w-6 mb-0.5 transition-transform group-hover:scale-110" />
-                <span className="text-xs font-medium">{t(labelKey)}</span>
-              </Link>
-            </li>
-          ))}
-
-          {/* Midt-CTA (Start) – samme linjehøyde/størrelse -------------------- */}
+        <ul className="flex h-full items-center justify-around">
+          {/* Venstre tab -------------------------------------------------- */}
           <li className="flex-1">
             <Link
-              href="/"
-              aria-label={t('BottomNav.ariaStart', { defaultValue: 'Start run' })}
-              className="group flex h-full flex-col items-center justify-center p-2 transition
-                         duration-150 ease-in-out text-primary hover:text-primary-light"
+              href={tabs[0].href}
+              aria-label={tabs[0].aria}
+              className={`group flex h-full flex-col items-center justify-center p-2 transition-colors
+                          duration-150 ${
+                            isActive(tabs[0].href)
+                              ? 'text-primary'
+                              : 'text-neutral-500 hover:text-neutral-700'
+                          }`}
             >
-              {/* Ikonet er fylt oransje for å skille seg ut */}
-              <PlayCircle className="h-6 w-6 mb-0.5" fill="currentColor" />
-              <span className="text-xs font-medium">{t('BottomNav.start', { defaultValue: 'Start' })}</span>
+              <LeftIcon className="h-6 w-6 mb-0.5" />
+              <span className="text-xs font-medium">{tabs[0].label}</span>
             </Link>
           </li>
 
-          {/* Høyre fane ------------------------------------------------------ */}
-          {navItems.slice(1).map(({ href, Icon, labelKey, ariaLabelKey }) => (
-            <li key={href} className="flex-1">
-              <Link
-                href={href}
-                aria-label={t(ariaLabelKey)}
-                className={`group flex h-full flex-col items-center justify-center p-2 transition-colors
-                            duration-150 ease-in-out ${
-                              isActive(href)
-                                ? 'text-primary'
-                                : 'text-neutral-500 hover:text-neutral-700'
-                            }`}
-              >
-                <Icon className="h-6 w-6 mb-0.5 transition-transform group-hover:scale-110" />
-                <span className="text-xs font-medium">{t(labelKey)}</span>
-              </Link>
-            </li>
-          ))}
+          {/* Midt-CTA – bare ikon ---------------------------------------- */}
+          <li className="flex-1">
+            <Link
+              href="/"
+              aria-label={t('BottomNav.ariaStart', { defaultValue: 'Start' })}
+              className="flex h-full flex-col items-center justify-center p-2
+                         text-primary hover:text-primary-light transition-colors duration-150"
+            >
+              <Play className="h-6 w-6" />
+            </Link>
+          </li>
+
+          {/* Høyre tab --------------------------------------------------- */}
+          <li className="flex-1">
+            <Link
+              href={tabs[1].href}
+              aria-label={tabs[1].aria}
+              className={`group flex h-full flex-col items-center justify-center p-2 transition-colors
+                          duration-150 ${
+                            isActive(tabs[1].href)
+                              ? 'text-primary'
+                              : 'text-neutral-500 hover:text-neutral-700'
+                          }`}
+            >
+              <RightIcon className="h-6 w-6 mb-0.5" />
+              <span className="text-xs font-medium">{tabs[1].label}</span>
+            </Link>
+          </li>
         </ul>
       </nav>
     </footer>
