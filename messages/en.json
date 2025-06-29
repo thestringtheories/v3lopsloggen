@@ -55,7 +55,9 @@
     "history": "Historikk",
     "ariaHome": "Gå til Hjemmesiden",
     "ariaHistory": "Se løpshistorikk",
-    "ariaLogout": "Logg ut"
+    "ariaLogout": "Logg ut",
+    "start": "Run",
+    "ariaStart": "Start a new run"
   },
   "Firebase": {
     "saveSuccess": "Økt lagret!",
