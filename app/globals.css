@@ -103,7 +103,8 @@ body {
      Halvtransparent hvit bakgrunn + blur til kort og overlays
   -----------------------------------------------------------------*/
   .glass-card {
-    @apply bg-white/60 backdrop-blur-[4px] shadow-lg rounded-2xl;
+    @apply bg-white/80 backdrop-blur-[2px] backdrop-brightness-110
+           border border-white/50 shadow-lg rounded-2xl;
   }
 
   /* ----------------------------------------------------------------
