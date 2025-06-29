@@ -1,119 +1,99 @@
 // components/layout/BottomNav.tsx
-"use client";
+'use client';
 
 import React from 'react';
 import { Link, usePathname } from '@/app/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/hooks/useAuth';
+import { Home, List, PlayCircle } from 'lucide-react';
 
-// ---------- IKONER ----------
-const HomeIconSolid = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.061l8.69-8.69Z" />
-    <path d="M12 5.432 4.03 13.403v5.498c0 1.108.892 2.002 2 2.002h12.006a2 2 0 0 0 1.962-2.002v-5.498L12 5.432Z" />
-  </svg>
-);
-const HomeIconOutline = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5"
-    />
-  </svg>
-);
-
-const HistoryIconSolid = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path
-      fillRule="evenodd"
-      d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z"
-      clipRule="evenodd"
-    />
-  </svg>
-);
-const HistoryIconOutline = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-  </svg>
-);
-
-const LogoutIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
-    />
-  </svg>
-);
-
-// ---------- KOMPONENT ----------
+/* ------------------------------------------------------------------
+   Bottom navigation bar
+   – Venstre: Feed          (/)
+   – Midten : Start-knapp   (/run)
+   – Høyre  : Historikk     (/history)
+-------------------------------------------------------------------*/
 const BottomNav: React.FC = () => {
   const t = useTranslations();
   const pathname = usePathname();
-  const { logout } = useAuth();
 
+  /** Ikon-tabs på hver side av CTA-knappen */
   const navItems = [
     {
       href: '/',
       labelKey: 'BottomNav.home',
       ariaLabelKey: 'BottomNav.ariaHome',
-      IconOutline: HomeIconOutline,
-      IconSolid: HomeIconSolid,
+      Icon: Home,
     },
     {
       href: '/history',
       labelKey: 'BottomNav.history',
       ariaLabelKey: 'BottomNav.ariaHistory',
-      IconOutline: HistoryIconOutline,
-      IconSolid: HistoryIconSolid,
+      Icon: List,
     },
   ];
 
-  const handleLogout = async () => {
-    await logout();
-    // redirect håndteres av AuthProvider/MainLayout
-  };
+  const isActive = (href: string) => pathname === href;
 
   return (
     <footer
-      className="fixed bottom-0 inset-x-0 bg-white shadow-md pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-50
+                 bg-white/95 backdrop-blur-sm
+                 border-t border-neutral-200 shadow-top-md
+                 pb-[env(safe-area-inset-bottom)]"
       style={{ height: 'var(--nav-h)' }}
     >
       <nav className="h-full">
-        <ul className="flex justify-around items-center h-full">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            const Icon = isActive ? item.IconSolid : item.IconOutline;
+        <ul className="flex items-center justify-around h-full">
+          {/* Venstre fane(r) -------------------------------------------------- */}
+          {navItems.slice(0, 1).map(({ href, Icon, labelKey, ariaLabelKey }) => (
+            <li key={href} className="flex-1">
+              <Link
+                href={href}
+                aria-label={t(ariaLabelKey)}
+                className={`group flex h-full flex-col items-center justify-center p-2 transition-colors
+                            duration-150 ease-in-out ${
+                              isActive(href)
+                                ? 'text-primary'
+                                : 'text-neutral-500 hover:text-neutral-700'
+                            }`}
+              >
+                <Icon className="h-6 w-6 mb-0.5 transition-transform group-hover:scale-110" />
+                <span className="text-xs font-medium">{t(labelKey)}</span>
+              </Link>
+            </li>
+          ))}
 
-            return (
-              <li key={item.href} className="flex-1">
-                <Link
-                  href={item.href}
-                  aria-label={t(item.ariaLabelKey)}
-                  className={`flex flex-col items-center justify-center h-full p-2 transition-colors duration-150 ease-in-out group ${
-                    isActive ? 'text-primary' : 'text-neutral-500 hover:text-primary-light'
-                  }`}
-                >
-                  <Icon className="w-6 h-6 mb-0.5 transform group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-medium">{t(item.labelKey)}</span>
-                </Link>
-              </li>
-            );
-          })}
-
-          {/* LOGG UT */}
-          <li className="flex-1">
-            <button
-              onClick={handleLogout}
-              aria-label={t('BottomNav.ariaLogout')}
-              className="flex flex-col items-center justify-center h-full p-2 w-full text-neutral-500 hover:text-error group transition-colors duration-150 ease-in-out"
+          {/* Midt-CTA (Start) -------------------------------------------------- */}
+          <li className="-translate-y-3">
+            <Link
+              href="/run"
+              aria-label={t('BottomNav.ariaStart', { defaultValue: 'Start run' })}
+              className="flex h-16 w-16 items-center justify-center rounded-full
+                         bg-primary text-white shadow-lg
+                         hover:bg-primary-light active:scale-95 transition"
             >
-              <LogoutIcon className="w-6 h-6 mb-0.5 transform group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-medium">{t('Auth.logoutButton')}</span>
-            </button>
+              <PlayCircle className="h-8 w-8" />
+            </Link>
           </li>
+
+          {/* Høyre fane(r) ---------------------------------------------------- */}
+          {navItems.slice(1).map(({ href, Icon, labelKey, ariaLabelKey }) => (
+            <li key={href} className="flex-1">
+              <Link
+                href={href}
+                aria-label={t(ariaLabelKey)}
+                className={`group flex h-full flex-col items-center justify-center p-2 transition-colors
+                            duration-150 ease-in-out ${
+                              isActive(href)
+                                ? 'text-primary'
+                                : 'text-neutral-500 hover:text-neutral-700'
+                            }`}
+              >
+                <Icon className="h-6 w-6 mb-0.5 transition-transform group-hover:scale-110" />
+                <span className="text-xs font-medium">{t(labelKey)}</span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </nav>
     </footer>
