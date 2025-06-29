@@ -226,115 +226,116 @@ const RunHomeClient: React.FC = () => {
   /* ========================== RENDER =========================== */
   return (
     <div className="flex flex-col min-h-screen bg-neutral-100">
-      {showSessionHeader && (
-        <SessionHeader
-          activeDuration={state.activeDuration}
-          route={state.route}
-          gpsSignalLost={state.gpsSignalLost}
-        />
-      )}
+    {showSessionHeader && (
+      <SessionHeader
+        activeDuration={state.activeDuration}
+        route={state.route}
+        gpsSignalLost={state.gpsSignalLost}
+      />
+    )}
 
-      <main className="flex-1 flex flex-col min-h-0 relative pb-[calc(var(--nav-h)_+_1rem)]">
-        {/* KART – fyller all ledig plass */}
-        <div className="flex-1 min-h-0 w-full rounded-lg overflow-hidden border border-neutral-200">
-          <MapContainer
-            center={state.currentPosition
-              ? [state.currentPosition.lat, state.currentPosition.lng]
-              : [59.9139, 10.7522]}
-            zoom={16}
-            className="w-full h-full"
-            zoomControl={false}
-            whenReady={() => {
-              setTimeout(() => {
-                if (mapRef.current) mapRef.current.invalidateSize();
-              }, 100);
-            }}
-          >
-            <MapInstanceGrabber onMapInstance={handleMapInstance} />
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    <main className="flex flex-col flex-1 min-h-0">
+      {/* KART – fyller all ledig plass */}
+      <div className="flex-1 min-h-0 w-full rounded-lg overflow-hidden border border-neutral-200">
+        <MapContainer
+          center={state.currentPosition
+            ? [state.currentPosition.lat, state.currentPosition.lng]
+            : [59.9139, 10.7522]}
+          zoom={16}
+          className="w-full h-full"
+          style={{ width: "100%", height: "100%" }} // NB!
+          zoomControl={false}
+          whenReady={() => {
+            setTimeout(() => {
+              if (mapRef.current) mapRef.current.invalidateSize();
+            }, 100);
+          }}
+        >
+          <MapInstanceGrabber onMapInstance={handleMapInstance} />
+          <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          />
+          {state.route.length > 1 && (
+            <Polyline
+              pathOptions={{ color: '#14b8a6', weight: 5, opacity: 0.9 }}
+              positions={state.route.map((p) => [p.lat, p.lng] as [number, number])}
             />
-            {state.route.length > 1 && (
-              <Polyline
-                pathOptions={{ color: '#14b8a6', weight: 5, opacity: 0.9 }}
-                positions={state.route.map((p) => [p.lat, p.lng] as [number, number])}
-              />
-            )}
-            {state.currentPosition && (
-              <Marker
-                position={[state.currentPosition.lat, state.currentPosition.lng]}
-                icon={pulseIcon ?? undefined}
-              />
-            )}
-            <ZoomControl position="bottomright" />
-          </MapContainer>
-        </div>
+          )}
+          {state.currentPosition && (
+            <Marker
+              position={[state.currentPosition.lat, state.currentPosition.lng]}
+              icon={pulseIcon ?? undefined}
+            />
+          )}
+          <ZoomControl position="bottomright" />
+        </MapContainer>
+      </div>
 
-        {/* FAB / handling-knapper */}
-        <FABwrapper>
-          {state.status === 'idle' && !state.error && state.currentPosition && (
+      {/* FAB / handling-knapper */}
+      <FABwrapper>
+        {state.status === 'idle' && !state.error && state.currentPosition && (
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
+            icon={<PlayIcon />}
+            onClick={handleStartRun}
+            aria-label={t('RunControls.start')}
+          >
+            {t('RunControls.start')}
+          </Button>
+        )}
+
+        {state.status === 'running' && (
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
+            icon={<PauseIcon />}
+            onClick={() => dispatch({ type: 'PAUSE_RUN' })}
+            aria-label={t('RunControls.pause')}
+          >
+            {t('RunControls.pause')}
+          </Button>
+        )}
+
+        {state.status === 'paused' && (
+          <div className="flex w-full max-w-xs mx-auto mb-4 gap-4">
             <Button
               variant="primary"
               size="lg"
-              className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
+              className="flex-1 flex items-center justify-center gap-2"
               icon={<PlayIcon />}
-              onClick={handleStartRun}
-              aria-label={t('RunControls.start')}
+              onClick={() => dispatch({ type: 'RESUME_RUN' })}
+              aria-label={t('RunControls.resume')}
             >
-              {t('RunControls.start')}
+              {t('RunControls.resume')}
             </Button>
-          )}
-
-          {state.status === 'running' && (
             <Button
-              variant="primary"
+              variant="neutral"
               size="lg"
-              className="w-full max-w-xs mx-auto mb-4 flex items-center justify-center gap-2"
-              icon={<PauseIcon />}
-              onClick={() => dispatch({ type: 'PAUSE_RUN' })}
-              aria-label={t('RunControls.pause')}
+              className="flex-1 flex items-center justify-center gap-2"
+              icon={<StopIcon />}
+              onClick={handleSaveRun}
+              aria-label={t('RunControls.endAndSave')}
             >
-              {t('RunControls.pause')}
+              {t('RunControls.endAndSave')}
             </Button>
-          )}
+          </div>
+        )}
+      </FABwrapper>
+    </main>
 
-          {state.status === 'paused' && (
-            <div className="flex w-full max-w-xs mx-auto mb-4 gap-4">
-              <Button
-                variant="primary"
-                size="lg"
-                className="flex-1 flex items-center justify-center gap-2"
-                icon={<PlayIcon />}
-                onClick={() => dispatch({ type: 'RESUME_RUN' })}
-                aria-label={t('RunControls.resume')}
-              >
-                {t('RunControls.resume')}
-              </Button>
-              <Button
-                variant="neutral"
-                size="lg"
-                className="flex-1 flex items-center justify-center gap-2"
-                icon={<StopIcon />}
-                onClick={handleSaveRun}
-                aria-label={t('RunControls.endAndSave')}
-              >
-                {t('RunControls.endAndSave')}
-              </Button>
-            </div>
-          )}
-        </FABwrapper>
-      </main>
-
-      <style jsx global>{`
-        .custom-pulse-icon div { animation: customPulse 1.75s infinite cubic-bezier(0.66,0,0,1); }
-        @keyframes customPulse { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.7;} }
-        .leaflet-container{height:100%;width:100%;}
-        .leaflet-control-zoom{border:none!important;box-shadow:0 2px 8px rgb(0 0 0 / .2)!important;}
-        .leaflet-control-zoom a{background:#fff!important;color:#334155!important;border-bottom:1px solid #e2e8f0!important;}
-        .leaflet-control-zoom a:hover{background:#f1f5f9!important;}
-      `}</style>
-    </div>
+    <style jsx global>{`
+      .custom-pulse-icon div { animation: customPulse 1.75s infinite cubic-bezier(0.66,0,0,1); }
+      @keyframes customPulse { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:.7;} }
+      .leaflet-container{height:100%;width:100%;}
+      .leaflet-control-zoom{border:none!important;box-shadow:0 2px 8px rgb(0 0 0 / .2)!important;}
+      .leaflet-control-zoom a{background:#fff!important;color:#334155!important;border-bottom:1px solid #e2e8f0!important;}
+      .leaflet-control-zoom a:hover{background:#f1f5f9!important;}
+    `}</style>
+  </div>
   );
 };
 
